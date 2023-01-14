@@ -1,0 +1,24 @@
+{
+  "name": "silverkey2",
+  "version": "0.0.1",
+  "description": "Tool for One-Liner Sharing",
+  "main": "./src/main/main.js",
+  "repository": "git@github.com:dukov/silverkey2.git",
+  "author": "Dmitry Ukov <dukov@mirantis.com>",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "electron": "^22.0.2",
+    "electron-builder": "^23.6.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.electron.silverkey2",
+    "mac": {
+      "category": "public.app-category.productivity"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <link rel="stylesheet" type="text/css" href="./style.css">
+  </head>
+  <body>
+    <div class="main">
+      <div class="search-row">
+        <div class="search-left">
+        </div>
+        <div class="search-center">
+          <input type="text" class="search-key" id="search-input">
+        </div>
+        <div class="search-right">
+          <a href="#" class="add-save-key" id="add-key">&#10133;</a>
+          <a href="#" class="add-save-key" id="save-key" hidden>&#10004;</a>
+        </div>
+      </div>
+      <div class="delimiter"></div>
+      <div class="result-rows" id="result-rows">
+      </div>
+      <div class="footer"></div>
+    </div>
+    <script src="renderer.js"></script>
+  </body>
+</html>

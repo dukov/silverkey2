@@ -1,0 +1,122 @@
+// main.js
+
+// Modules to control application life and create native browser window
+const {
+  app,
+  BrowserWindow,
+  ipcMain,
+  Tray,
+  nativeImage,
+  Menu,
+  globalShortcut,
+} = require("electron");
+const path = require("path");
+
+const { FileDB } = require("./lib/localdb/filedb");
+
+const assetsDirectory = path.join(__dirname, "../../assets");
+const rendererDir = path.join(__dirname, "../renderer");
+
+if (process.platform == "darwin") app.dock.hide();
+
+let tray = undefined;
+let mainWindow = undefined;
+
+const createWindow = () => {
+  // Create the browser window.
+  mainWindow = new BrowserWindow({
+    width: 800,
+    height: 600,
+    //transparent: true,
+    skipTaskbar: true,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
+  });
+
+  // and load the index.html of the app.
+  mainWindow.loadFile(path.join(rendererDir, "index.html"));
+
+  // Open the DevTools.
+  mainWindow.webContents.openDevTools();
+};
+
+const createTray = async () => {
+  const icon_path = path.join(assetsDirectory, "sk_logo.png");
+  let icon = icon_path;
+  if (process.platform !== "linux") {
+    icon = await nativeImage.createThumbnailFromPath(icon_path, {
+      width: 30,
+      height: 30,
+    });
+  }
+
+  tray = new Tray(icon);
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: "Settings",
+      type: "normal",
+    },
+    {
+      label: "Quit",
+      type: "normal",
+      click: () => {
+        app.quit();
+      },
+    },
+  ]);
+
+  tray.setContextMenu(contextMenu);
+};
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+// Some APIs can only be used after this event occurs.
+app
+  .whenReady()
+  .then(() => {
+    globalShortcut.register("Alt+CommandOrControl+I", () => {
+      if (!mainWindow) {
+        createWindow();
+      }
+    });
+  })
+  .then(() => {
+    createWindow();
+    createTray();
+
+    app.on("activate", () => {
+      // On macOS it's common to re-create a window in the app when the
+      // dock icon is clicked and there are no other windows open.
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  });
+
+// Quit when all windows are closed, except on macOS. There, it's common
+// for applications and their menu bar to stay active until the user quits
+// explicitly with Cmd + Q.
+app.on("window-all-closed", () => {
+  mainWindow = undefined;
+  //app.quit();
+});
+
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and require them here.
+
+const db = new FileDB("/tmp/huh");
+
+ipcMain.handle("get-keys", async (evt, data) => {
+  return db.getKeys();
+});
+
+ipcMain.handle("get-val", async (evt, key) => {
+  return db.getValue(key);
+});
+
+ipcMain.handle("set-val", async (evt, key, value) => {
+  return db.setValue(key, value);
+});
+
+ipcMain.handle("app-hide", async (evt) => {
+  return app.hide();
+});
