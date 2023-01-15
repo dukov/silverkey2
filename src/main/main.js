@@ -106,7 +106,9 @@ app.on("window-all-closed", () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
-const db = new FileDB("/tmp/huh");
+const userData = app.getPath("userData");
+console.log("User data dir", userData);
+const db = new FileDB(path.join(userData, "kvdb.json"));
 
 ipcMain.handle("get-keys", async (evt, data) => {
   return db.getKeys();
