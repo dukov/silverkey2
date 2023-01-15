@@ -1,6 +1,7 @@
 document
   .getElementById("search-input")
   .addEventListener("keyup", inputActionsHandler);
+
 const addKeyBtn = document.getElementById("add-key");
 addKeyBtn.addEventListener("click", addKey);
 const saveKeyBtn = document.getElementById("save-key");
@@ -24,7 +25,7 @@ async function saveKey() {
 
 async function addKey(evt) {
   const results = document.getElementById("result-rows");
-  results.innerHTML = "";
+  removeAllChildNodes(results);
   const textArea = document.createElement("textarea");
   textArea.id = "set-value";
   results.appendChild(textArea);
@@ -70,7 +71,7 @@ async function inputActionsHandler(event) {
     window.close();
   } else {
     const searchText = input.value.toUpperCase();
-    list.innerHTML = "";
+    removeAllChildNodes(list);
     for (let [idx, key] of filterKeys(searchText).entries()) {
       list.appendChild(renderResultRow(key, idx));
     }
@@ -89,17 +90,43 @@ function filterKeys(searchText) {
   return all_keys.filter((key) => key.toUpperCase().indexOf(searchText) > -1);
 }
 
+async function deleteKey(evt) {
+  const key = evt.target.getAttribute("data-key");
+  console.log("Deleting", key);
+  await window.eAPI.deleteKey(key);
+  await getAllKeys();
+  const input = document.getElementById("search-input");
+  input.focus();
+  inputActionsHandler({ key: "" });
+}
+
 function renderResultRow(key, idx) {
   let row = document.createElement("div");
   row.classList.add("result-key-row");
-  let content = `
-  <div class="result-key">
-    <a href="#" id="result-key-${idx}">${key}</a>
-  </div>
-  <div class="result-key-remove">
-    <a href="#">-</a>
-  </div>
-  `;
-  row.innerHTML = content;
+  let resKeyDiv = document.createElement("div");
+  resKeyDiv.classList.add("result-key");
+  let resKeyLnk = document.createElement("a");
+  resKeyLnk.id = `result-key-${idx}`;
+  resKeyLnk.href = "#";
+  resKeyLnk.innerText = key;
+  resKeyDiv.appendChild(resKeyLnk);
+
+  let resKeyRemoveDiv = document.createElement("div");
+  resKeyRemoveDiv.classList.add("result-key-remove");
+  let resKeyRemoveLnk = document.createElement("a");
+  resKeyRemoveLnk.href = "#";
+  resKeyRemoveLnk.innerText = "-";
+  resKeyRemoveLnk.setAttribute("data-key", key);
+  resKeyRemoveLnk.addEventListener("click", deleteKey);
+  resKeyRemoveDiv.appendChild(resKeyRemoveLnk);
+
+  row.appendChild(resKeyDiv);
+  row.appendChild(resKeyRemoveDiv);
   return row;
+}
+
+function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
 }

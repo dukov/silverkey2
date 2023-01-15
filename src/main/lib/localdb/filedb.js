@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require("fs");
 
 class FileWatcher {
   path;
@@ -7,7 +7,6 @@ class FileWatcher {
   }
 
   startWatch() {
-    
     console.log(`Watching for file changes on ${this.path}`);
     fs.watchFile(this.path, (curr, prev) => {
       console.log(`${this.path} file Changed`);
@@ -15,38 +14,49 @@ class FileWatcher {
   }
 }
 
-
 class FileDB {
   contents;
   path;
   constructor(path) {
-    this.path = path
-    this.contents = {}
+    this.path = path;
+    this.contents = {};
     fs.readFile(this.path, (err, data) => {
       if (err) {
-        console.log(`File ${this.path} does not exists initializing with empty DB`)
+        console.log(
+          `File ${this.path} does not exists initializing with empty DB`
+        );
       } else {
-        this.contents = JSON.parse(data)
+        this.contents = JSON.parse(data);
       }
-    })
+    });
   }
+
+  #saveData() {
+    let data = JSON.stringify(this.contents, null, 2);
+    fs.writeFile(this.path, data, (err) => {
+      if (err) throw err;
+    });
+  }
+
   setValue(key, value) {
-	  this.contents[key] = value
-	  let data = JSON.stringify(this.contents, null, 2)
-	  fs.writeFile(this.path, data,(err) => {
-	  if (err) throw err
-	})
+    this.contents[key] = value;
+    this.#saveData();
   }
 
   getValue(key) {
-	  return this.contents[key]
+    return this.contents[key];
   }
 
   getKeys() {
-	  return Object.keys(this.contents)
+    return Object.keys(this.contents);
+  }
+
+  deleteKey(key) {
+    delete this.contents[key];
+    this.#saveData();
   }
 }
 
 module.exports = {
-  FileDB
-}
+  FileDB,
+};

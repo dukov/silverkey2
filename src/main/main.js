@@ -124,6 +124,10 @@ ipcMain.handle("set-val", async (evt, key, value) => {
   return db.setValue(key, value);
 });
 
+ipcMain.handle("delete-key", async (evt, key) => {
+  return db.deleteKey(key);
+});
+
 ipcMain.handle("app-hide", async (evt) => {
   if (process.platform == "darwin") {
     app.hide();
