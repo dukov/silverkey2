@@ -21,6 +21,9 @@
       "category": "public.app-category.productivity",
       "identity": null
     },
+    "linux": {
+      "target": "AppImage"
+    },
     "extraResources": ["./assets/**"]
   }
 }
