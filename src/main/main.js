@@ -14,7 +14,10 @@ const path = require("path");
 
 const { FileDB } = require("./lib/localdb/filedb");
 
-const assetsDirectory = path.join(__dirname, "../../assets");
+const assetsDirectory = app.isPackaged
+  ? path.join(process.resourcesPath, "assets")
+  : path.join(__dirname, "../../assets");
+console.log("Assets", assetsDirectory);
 const rendererDir = path.join(__dirname, "../renderer");
 
 if (process.platform == "darwin") app.dock.hide();
