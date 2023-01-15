@@ -81,6 +81,8 @@ app
     globalShortcut.register("Alt+CommandOrControl+I", () => {
       if (!mainWindow) {
         createWindow();
+      } else {
+        app.focus({ steal: true });
       }
     });
   })
@@ -100,7 +102,7 @@ app
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
   mainWindow = undefined;
-  //app.quit();
+  if (process.platform == "darwin") app.hide();
 });
 
 // In this file you can include the rest of your app's specific main process
@@ -123,5 +125,9 @@ ipcMain.handle("set-val", async (evt, key, value) => {
 });
 
 ipcMain.handle("app-hide", async (evt) => {
-  return app.hide();
+  if (process.platform == "darwin") {
+    app.hide();
+  } else {
+    mainWindow.close();
+  }
 });
