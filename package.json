@@ -18,7 +18,8 @@
   "build": {
     "appId": "com.electron.silverkey2",
     "mac": {
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "identity": null
     }
   }
 }
