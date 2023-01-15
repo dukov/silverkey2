@@ -30,7 +30,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    //transparent: true,
+    transparent: app.isPackaged,
     skipTaskbar: true,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -41,7 +41,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(rendererDir, "index.html"));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (!app.isPackaged) mainWindow.webContents.openDevTools();
 };
 
 const createTray = async () => {
