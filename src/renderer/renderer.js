@@ -10,8 +10,20 @@ window.addEventListener("load", getAllKeys);
 
 document.getElementById("search-input").focus();
 
+document.body.addEventListener("click", bodyClick, true);
+
 var all_keys = [];
 var selected_idx = 0;
+
+const REMOVE_KEY_CLASS = "remove-key-btn";
+
+function bodyClick(evt) {
+  console.log(evt);
+  if (evt.target.classList.contains(REMOVE_KEY_CLASS)) {
+    const key = evt.target.getAttribute("data-key");
+    deleteKey(key);
+  }
+}
 
 async function saveKey() {
   const input = document.getElementById("search-input");
@@ -92,8 +104,7 @@ function filterKeys(searchText) {
   return all_keys.filter((key) => key.toUpperCase().indexOf(searchText) > -1);
 }
 
-async function deleteKey(evt) {
-  const key = evt.target.getAttribute("data-key");
+async function deleteKey(key) {
   console.log("Deleting", key);
   await window.eAPI.deleteKey(key);
   await getAllKeys();
@@ -119,7 +130,7 @@ function renderResultRow(key, idx) {
   resKeyRemoveLnk.href = "#";
   resKeyRemoveLnk.innerText = "-";
   resKeyRemoveLnk.setAttribute("data-key", key);
-  resKeyRemoveLnk.addEventListener("click", deleteKey);
+  resKeyRemoveLnk.classList.add(REMOVE_KEY_CLASS);
   resKeyRemoveDiv.appendChild(resKeyRemoveLnk);
 
   row.appendChild(resKeyDiv);
