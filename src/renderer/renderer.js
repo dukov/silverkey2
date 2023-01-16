@@ -8,6 +8,8 @@ const saveKeyBtn = document.getElementById("save-key");
 saveKeyBtn.addEventListener("click", saveKey);
 window.addEventListener("load", getAllKeys);
 
+document.getElementById("search-input").focus();
+
 var all_keys = [];
 var selected_idx = 0;
 
