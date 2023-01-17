@@ -11,18 +11,28 @@ window.addEventListener("load", getAllKeys);
 document.getElementById("search-input").focus();
 
 document.body.addEventListener("click", bodyClick, true);
+document
+  .getElementById("result-rows")
+  .addEventListener("mouseenter", mouseOverResults);
 
 var all_keys = [];
 var selected_idx = 0;
 
 const REMOVE_KEY_CLASS = "remove-key-btn";
+const RESULT_KEY_LINK_CLASS = "result-key-lnk";
+const RESULTS_ROW_CLASS = "result-key-row";
 
 function bodyClick(evt) {
-  console.log(evt);
   if (evt.target.classList.contains(REMOVE_KEY_CLASS)) {
     const key = evt.target.getAttribute("data-key");
     deleteKey(key);
   }
+}
+
+function mouseOverResults() {
+  const list = document.getElementById("result-rows");
+  list.children[selected_idx].classList.remove("result-key-row-selected");
+  selected_idx = 0;
 }
 
 async function saveKey() {
@@ -115,13 +125,16 @@ async function deleteKey(key) {
 
 function renderResultRow(key, idx) {
   let row = document.createElement("div");
-  row.classList.add("result-key-row");
+  row.classList.add(RESULTS_ROW_CLASS);
+  row.setAttribute("data-row-idx", idx);
+
   let resKeyDiv = document.createElement("div");
   resKeyDiv.classList.add("result-key");
   let resKeyLnk = document.createElement("a");
   resKeyLnk.id = `result-key-${idx}`;
   resKeyLnk.href = "#";
   resKeyLnk.innerText = key;
+  resKeyLnk.classList.add(RESULT_KEY_LINK_CLASS);
   resKeyDiv.appendChild(resKeyLnk);
 
   let resKeyRemoveDiv = document.createElement("div");
