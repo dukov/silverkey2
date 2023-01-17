@@ -2,6 +2,12 @@ document
   .getElementById("search-input")
   .addEventListener("keyup", inputActionsHandler);
 
+document.body.addEventListener("click", bodyClick, true);
+
+document
+  .getElementById("result-rows")
+  .addEventListener("mouseenter", mouseOverResults);
+
 const addKeyBtn = document.getElementById("add-key");
 addKeyBtn.addEventListener("click", addKey);
 const saveKeyBtn = document.getElementById("save-key");
@@ -9,11 +15,6 @@ saveKeyBtn.addEventListener("click", saveKey);
 window.addEventListener("load", getAllKeys);
 
 document.getElementById("search-input").focus();
-
-document.body.addEventListener("click", bodyClick, true);
-document
-  .getElementById("result-rows")
-  .addEventListener("mouseenter", mouseOverResults);
 
 var all_keys = [];
 var selected_idx = 0;
@@ -51,8 +52,10 @@ async function addKey(evt) {
   const results = document.getElementById("result-rows");
   removeAllChildNodes(results);
   const textArea = document.createElement("textarea");
+  textArea.classList.add("add-value-textarea");
   textArea.id = "set-value";
   results.appendChild(textArea);
+  textArea.focus();
   addKeyBtn.hidden = true;
   saveKeyBtn.hidden = false;
 }

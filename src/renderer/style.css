@@ -79,6 +79,18 @@
   margin-right: 12px;
 }
 
+.add-value-textarea {
+  background: transparent;
+  border: none;
+  height: 200px;
+  resize: none;
+  margin: 12px;
+}
+
+.add-value-textarea:focus {
+  outline: none;
+}
+
 .footer {
  margin: 12px;
 }
