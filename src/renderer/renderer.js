@@ -36,6 +36,17 @@ function mouseOverResults() {
   selected_idx = 0;
 }
 
+function textAreaEscape(evt) {
+  if (evt.key == "Escape") {
+    const input = document.getElementById("search-input");
+    saveKeyBtn.hidden = true;
+    addKeyBtn.hidden = false;
+    input.focus();
+    input.select();
+    inputActionsHandler({ key: "" });
+  }
+}
+
 async function saveKey() {
   const input = document.getElementById("search-input");
   const textArea = document.getElementById("set-value");
@@ -48,10 +59,11 @@ async function saveKey() {
   inputActionsHandler({ key: "" });
 }
 
-async function addKey(evt) {
+function addKey(evt) {
   const results = document.getElementById("result-rows");
   removeAllChildNodes(results);
   const textArea = document.createElement("textarea");
+  textArea.addEventListener("keyup", textAreaEscape);
   textArea.classList.add("add-value-textarea");
   textArea.id = "set-value";
   results.appendChild(textArea);
@@ -89,6 +101,9 @@ async function inputActionsHandler(event) {
     list.children[selected_idx].classList.add("result-key-row-selected");
     list.children[selected_idx].focus();
     input.focus();
+  } else if (event.key == "Escape") {
+    await window.eAPI.appHide();
+    window.close();
   } else if (event.key == "Enter") {
     const key = document.getElementById(`result-key-${selected_idx}`).innerText;
     const value = await window.eAPI.getValue(key);
