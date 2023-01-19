@@ -2,7 +2,7 @@
   "name": "silverkey2",
   "version": "0.0.1",
   "description": "Tool for One-Liner Sharing",
-  "main": "./src/main/main.js",
+  "main": "./dist/main/main.js",
   "repository": "git@github.com:dukov/silverkey2.git",
   "author": "Dmitry Ukov <dukov@mirantis.com>",
   "license": "Apache-2.0",
@@ -14,7 +14,8 @@
     "typescript": "^4.9.4"
   },
   "scripts": {
-    "start": "electron .",
+    "build": "tsc",
+    "start": "yarn run build && electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
   },

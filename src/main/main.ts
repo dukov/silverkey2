@@ -1,7 +1,7 @@
 // main.js
 
 // Modules to control application life and create native browser window
-const {
+import {
   app,
   BrowserWindow,
   ipcMain,
@@ -9,21 +9,22 @@ const {
   nativeImage,
   Menu,
   globalShortcut,
-} = require("electron");
-const path = require("path");
+  NativeImage,
+} from "electron";
+import { join } from "path";
 
-const { FileDB } = require("./lib/localdb/filedb");
+import { FileDB } from "./lib/localdb/filedb";
 
 const assetsDirectory = app.isPackaged
-  ? path.join(process.resourcesPath, "assets")
-  : path.join(__dirname, "../../assets");
+  ? join(process.resourcesPath, "assets")
+  : join(__dirname, "../../assets");
 console.log("Assets", assetsDirectory);
-const rendererDir = path.join(__dirname, "../renderer");
+const rendererDir = join(__dirname, "../../src/renderer");
 
 if (process.platform == "darwin") app.dock.hide();
 
-let tray = undefined;
-let mainWindow = undefined;
+let tray: Tray | null = null;
+let mainWindow: BrowserWindow | null = null;
 
 const createWindow = () => {
   // Create the browser window.
@@ -33,20 +34,20 @@ const createWindow = () => {
     transparent: app.isPackaged,
     skipTaskbar: true,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: join(__dirname, "../../src/main/preload.js"),
     },
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(rendererDir, "index.html"));
+  mainWindow.loadFile(join(rendererDir, "index.html"));
 
   // Open the DevTools.
   if (!app.isPackaged) mainWindow.webContents.openDevTools();
 };
 
 const createTray = async () => {
-  const icon_path = path.join(assetsDirectory, "sk_logo.png");
-  let icon = icon_path;
+  const icon_path = join(assetsDirectory, "sk_logo.png");
+  let icon: string | NativeImage = icon_path;
   if (process.platform !== "linux") {
     icon = await nativeImage.createThumbnailFromPath(icon_path, {
       width: 30,
@@ -101,7 +102,7 @@ app
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  mainWindow = undefined;
+  mainWindow = null;
   if (process.platform == "darwin") app.hide();
 });
 
@@ -110,7 +111,7 @@ app.on("window-all-closed", () => {
 
 const userData = app.getPath("userData");
 console.log("User data dir", userData);
-const db = new FileDB(path.join(userData, "kvdb.json"));
+const db = new FileDB(join(userData, "kvdb.json"));
 
 ipcMain.handle("get-keys", async (evt, data) => {
   return db.getKeys();
@@ -132,6 +133,8 @@ ipcMain.handle("app-hide", async (evt) => {
   if (process.platform == "darwin") {
     app.hide();
   } else {
-    mainWindow.close();
+    if (mainWindow) {
+      mainWindow.close();
+    }
   }
 });

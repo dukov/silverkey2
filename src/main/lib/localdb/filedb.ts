@@ -1,8 +1,8 @@
-const fs = require("fs");
+import fs from "fs";
 
 class FileWatcher {
-  path;
-  constructor(path) {
+  path: fs.PathLike;
+  constructor(path: fs.PathLike) {
     this.path = path;
   }
 
@@ -14,10 +14,10 @@ class FileWatcher {
   }
 }
 
-class FileDB {
-  contents;
-  path;
-  constructor(path) {
+export class FileDB {
+  contents: { [x: string]: any; };
+  path: fs.PathOrFileDescriptor;
+  constructor(path: fs.PathOrFileDescriptor) {
     this.path = path;
     this.contents = {};
     fs.readFile(this.path, (err, data) => {
@@ -26,7 +26,7 @@ class FileDB {
           `File ${this.path} does not exists initializing with empty DB`
         );
       } else {
-        this.contents = JSON.parse(data);
+        this.contents = JSON.parse(data.toString("utf-8"));
       }
     });
   }
@@ -38,12 +38,12 @@ class FileDB {
     });
   }
 
-  setValue(key, value) {
+  setValue(key: string | number, value: any) {
     this.contents[key] = value;
     this.#saveData();
   }
 
-  getValue(key) {
+  getValue(key: string | number) {
     return this.contents[key];
   }
 
@@ -51,12 +51,9 @@ class FileDB {
     return Object.keys(this.contents);
   }
 
-  deleteKey(key) {
+  deleteKey(key: string | number) {
     delete this.contents[key];
     this.#saveData();
   }
 }
 
-module.exports = {
-  FileDB,
-};
