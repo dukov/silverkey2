@@ -34,7 +34,7 @@ const createWindow = () => {
     transparent: app.isPackaged,
     skipTaskbar: true,
     webPreferences: {
-      preload: join(__dirname, "../../src/main/preload.js"),
+      preload: join(__dirname, "preload.js"),
     },
   });
 
