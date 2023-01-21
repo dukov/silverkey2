@@ -19,7 +19,7 @@ const assetsDirectory = app.isPackaged
   ? join(process.resourcesPath, "assets")
   : join(__dirname, "../../assets");
 console.log("Assets", assetsDirectory);
-const rendererDir = join(__dirname, "../../src/renderer");
+const rendererDir = join(__dirname, "../renderer");
 
 if (process.platform == "darwin") app.dock.hide();
 

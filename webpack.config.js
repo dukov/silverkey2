@@ -29,6 +29,9 @@ module.exports = [
     mode: "development",
     entry: "./src/renderer/index.tsx",
     target: "electron-renderer",
+    resolve: {
+      extensions: [".js", ".jsx", ".ts", ".tsx"],
+    },
     devtool: "source-map",
     module: {
       rules: [
@@ -36,6 +39,11 @@ module.exports = [
           test: /\.ts(x?)$/,
           include: /src/,
           use: [{ loader: "ts-loader" }],
+        },
+        {
+          test: /\.css$/,
+          include: /src/,
+          use: ["style-loader", "css-loader"],
         },
       ],
     },

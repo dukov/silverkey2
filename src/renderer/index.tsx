@@ -1,8 +1,7 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
- 
-const Index = () => {
-    return <div>Hello React!</div>;
-};
- 
-ReactDOM.render(<Index />, document.getElementById('app'));
+import React from "react";
+import { createRoot } from "react-dom/client";
+
+import Main from "./components/Main/Main";
+
+const root = createRoot(document.getElementById("app")!);
+root.render(<Main />);

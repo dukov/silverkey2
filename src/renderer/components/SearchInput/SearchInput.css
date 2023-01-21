@@ -1,0 +1,14 @@
+.search-input{
+  display: flex;
+  flex: 90%;
+} 
+
+.search-key {
+  background: transparent;
+  border: none;
+  width: 100%;
+}
+
+.search-key:focus {
+  outline: none;
+}

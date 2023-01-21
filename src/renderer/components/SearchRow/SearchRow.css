@@ -1,0 +1,9 @@
+.search-row {
+  display: flex;
+}
+
+.search-left{
+  display: flex;
+  width: 12px;
+}
+
