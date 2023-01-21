@@ -4,6 +4,8 @@ import "./SearchInput.css";
 
 export type SearchInputProps = {
   filterKeys: (filterTxt: string) => void;
+  moveUp: () => void;
+  moveDown: () => void;
 };
 
 type SearchInputState = {
@@ -12,7 +14,15 @@ type SearchInputState = {
 
 class SearchInput extends React.Component<SearchInputProps, SearchInputState> {
   state = { enteredVal: "" };
-  processKeyUp = (evt: KeyboardEvent<HTMLInputElement>) => {};
+  processKeyUp = (evt: KeyboardEvent<HTMLInputElement>) => {
+    const actionMap: { [key: string]: () => void } = {
+      ArrowUp: this.props.moveUp,
+      ArrowDown: this.props.moveDown,
+    };
+    if (actionMap[evt.key] != undefined) {
+      actionMap[evt.key]();
+    }
+  };
   processChange = (evt: ChangeEvent<HTMLInputElement>) => {
     this.setState({ enteredVal: evt.target.value });
     this.props.filterKeys(evt.target.value);

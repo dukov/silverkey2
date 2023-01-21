@@ -10,7 +10,11 @@ class SearchRow extends React.Component<SearchInputProps> {
     return (
       <div className="search-row">
         <div className="search-left"></div>
-        <SearchInput filterKeys={this.props.filterKeys} />
+        <SearchInput
+          filterKeys={this.props.filterKeys}
+          moveUp={this.props.moveUp}
+          moveDown={this.props.moveDown}
+        />
         <AddKeyBtn />
       </div>
     );

@@ -6,19 +6,20 @@ import ResultKeyBtn from "../ResultKeyBtn/ResultKeyBtn";
 import RemoveKeyBtn from "../RemoveKeyBtn/RemoveKeyBtn";
 import { ResultKeyProps } from "../Common/Types";
 
-type ResultKeyRowState = {
+type ResultKeyRowExtra = {
   selected: boolean;
 };
 
-class ResultKeyRow extends React.Component<ResultKeyProps, ResultKeyRowState> {
-  state = { selected: false };
+type ResultKeyRowProps = ResultKeyProps & ResultKeyRowExtra;
+
+class ResultKeyRow extends React.Component<ResultKeyRowProps> {
   render(): React.ReactNode {
+    let classes = "result-key-row";
+    if (this.props.selected) {
+      classes = "result-key-row result-key-row-selected";
+    }
     return (
-      <div
-        className={
-          this.state.selected ? "result-key-row-selected" : "result-key-row"
-        }
-      >
+      <div className={classes}>
         <ResultKeyBtn searchKey={this.props.searchKey} />
         <RemoveKeyBtn searchKey={this.props.searchKey} />
       </div>

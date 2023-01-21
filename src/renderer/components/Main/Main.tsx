@@ -8,10 +8,11 @@ import ResultRows from "../ResultRows/ResultRows";
 type MainState = {
   filteredKeys: string[];
   allKeys: string[];
+  selectedID: number;
 };
 
 class Main extends React.Component<{}, MainState> {
-  state = { filteredKeys: [], allKeys: [] };
+  state = { filteredKeys: [], allKeys: [], selectedID: 0 };
   async readAllKeys() {
     const allKeys = await window.eRPC.getKeys();
     console.log(`Updating from DB. Retrieved ${allKeys.length} keys from DB`);
@@ -31,12 +32,35 @@ class Main extends React.Component<{}, MainState> {
     }
     this.setState({ filteredKeys: filtered });
   };
+
+  moveSelectorUp = () => {
+    let curID = this.state.selectedID;
+    if (curID > 0) {
+      curID--;
+      this.setState({ selectedID: curID });
+    }
+  };
+  moveSelectorDown = () => {
+    let curID = this.state.selectedID;
+    if (curID < this.state.filteredKeys.length - 1) {
+      curID++;
+      this.setState({ selectedID: curID });
+    }
+  };
+
   render() {
     return (
       <div className="main">
-        <SearchRow filterKeys={this.filterKeys} />
+        <SearchRow
+          filterKeys={this.filterKeys}
+          moveUp={this.moveSelectorUp}
+          moveDown={this.moveSelectorDown}
+        />
         <div className="delimiter"></div>
-        <ResultRows resultKeys={this.state.filteredKeys} />
+        <ResultRows
+          resultKeys={this.state.filteredKeys}
+          selected_idx={this.state.selectedID}
+        />
         <div className="footer"></div>
       </div>
     );
