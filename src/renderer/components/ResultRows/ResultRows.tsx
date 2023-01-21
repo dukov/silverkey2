@@ -4,16 +4,15 @@ import "./ResultRows.css";
 
 import ResultKeyRow from "../ResultKeyRow/ResultKeyRow";
 
-type ResultRowsState = {
+type ResultRowsProp = {
   resultKeys: string[];
 };
 
-class ResultRows extends React.Component<{}, ResultRowsState> {
-  state = { resultKeys: [] };
+class ResultRows extends React.Component<ResultRowsProp> {
   render(): React.ReactNode {
     return (
       <div className="result-rows" id="result-rows">
-        {this.state.resultKeys.map((resultKey, idx) => (
+        {this.props.resultKeys.map((resultKey, idx) => (
           <ResultKeyRow key={idx} searchKey={resultKey} />
         ))}
       </div>

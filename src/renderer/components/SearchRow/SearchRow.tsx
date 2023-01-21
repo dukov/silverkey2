@@ -2,15 +2,15 @@ import React from "react";
 
 import "./SearchRow.css";
 
-import SearchInput from "../SearchInput/SearchInput";
+import SearchInput, { SearchInputProps } from "../SearchInput/SearchInput";
 import AddKeyBtn from "../AddKeyBtn/AddKeyBtn";
 
-class SearchRow extends React.Component {
+class SearchRow extends React.Component<SearchInputProps> {
   render() {
     return (
       <div className="search-row">
         <div className="search-left"></div>
-        <SearchInput />
+        <SearchInput filterKeys={this.props.filterKeys} />
         <AddKeyBtn />
       </div>
     );
