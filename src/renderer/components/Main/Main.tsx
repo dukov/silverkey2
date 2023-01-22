@@ -8,6 +8,7 @@ import { AddKeyBtnState } from "../Common/Types";
 import ValueInput from "../ValueInput/ValueInput";
 
 type MainState = {
+  searchVal: string;
   filteredKeys: string[];
   allKeys: string[];
   selectedID: number;
@@ -17,30 +18,32 @@ type MainState = {
 
 class Main extends React.Component<{}, MainState> {
   state = {
+    searchVal: "",
     filteredKeys: [],
     allKeys: [],
     selectedID: 0,
     addOrSave: AddKeyBtnState.Add,
     valueToAdd: "",
   };
-  async readAllKeys() {
+  async readAllKeys(): Promise<string[]> {
     const allKeys = await window.eRPC.getKeys();
     console.log(`Updating from DB. Retrieved ${allKeys.length} keys from DB`);
-    this.setState({ allKeys: allKeys });
+    return allKeys;
   }
   async componentDidMount() {
-    await this.readAllKeys();
+    const all_keys = await this.readAllKeys();
+    this.setState({ allKeys: all_keys });
   }
 
   filterKeys = (flt: string) => {
     let filtered: string[] = [];
-    if (flt != "") {
+    if (flt != "" && this.state.addOrSave == AddKeyBtnState.Add) {
       const searchText = flt.toUpperCase();
       filtered = this.state.allKeys.filter(
         (key: string) => key.toUpperCase().indexOf(searchText) > -1
       );
     }
-    this.setState({ filteredKeys: filtered });
+    this.setState({ filteredKeys: filtered, searchVal: flt });
   };
 
   moveSelectorUp = () => {
@@ -58,9 +61,18 @@ class Main extends React.Component<{}, MainState> {
     }
   };
 
-  saveKey = () => {
-    console.log("Key saved");
-    this.setState({ addOrSave: AddKeyBtnState.Add, valueToAdd: "" });
+  saveKey = async () => {
+    if (this.state.searchVal == "") {
+      console.log("Key is empty");
+      return;
+    }
+    await window.eRPC.setValue(this.state.searchVal, this.state.valueToAdd);
+    const all_keys = await this.readAllKeys();
+    this.setState({
+      addOrSave: AddKeyBtnState.Add,
+      valueToAdd: "",
+      allKeys: all_keys,
+    });
   };
   showAddKey = () => {
     this.setState({ addOrSave: AddKeyBtnState.Save });
@@ -91,6 +103,7 @@ class Main extends React.Component<{}, MainState> {
     return (
       <div className="main">
         <SearchRow
+          searchVal={this.state.searchVal}
           filterKeys={this.filterKeys}
           moveUp={this.moveSelectorUp}
           moveDown={this.moveSelectorDown}

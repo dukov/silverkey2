@@ -7,6 +7,7 @@ import AddKeyBtn from "../AddKeyBtn/AddKeyBtn";
 import { AddKeyBtnState } from "../Common/Types";
 
 type SearchRowExt = {
+  searchVal: string;
   addOrSave: AddKeyBtnState;
   saveKey: () => void;
   showAddKey: () => void;
@@ -20,6 +21,7 @@ class SearchRow extends React.Component<SearchRowProp> {
       <div className="search-row">
         <div className="search-left"></div>
         <SearchInput
+          searchVal={this.props.searchVal}
           filterKeys={this.props.filterKeys}
           moveUp={this.props.moveUp}
           moveDown={this.props.moveDown}
