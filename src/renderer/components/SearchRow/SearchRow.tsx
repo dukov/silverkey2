@@ -4,8 +4,17 @@ import "./SearchRow.css";
 
 import SearchInput, { SearchInputProps } from "../SearchInput/SearchInput";
 import AddKeyBtn from "../AddKeyBtn/AddKeyBtn";
+import { AddKeyBtnState } from "../Common/Types";
 
-class SearchRow extends React.Component<SearchInputProps> {
+type SearchRowExt = {
+  addOrSave: AddKeyBtnState;
+  saveKey: () => void;
+  showAddKey: () => void;
+};
+
+type SearchRowProp = SearchInputProps & SearchRowExt;
+
+class SearchRow extends React.Component<SearchRowProp> {
   render() {
     return (
       <div className="search-row">
@@ -15,7 +24,11 @@ class SearchRow extends React.Component<SearchInputProps> {
           moveUp={this.props.moveUp}
           moveDown={this.props.moveDown}
         />
-        <AddKeyBtn />
+        <AddKeyBtn
+          addOrSave={this.props.addOrSave}
+          showAddKey={this.props.showAddKey}
+          saveKey={this.props.saveKey}
+        />
       </div>
     );
   }

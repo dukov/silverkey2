@@ -4,15 +4,22 @@ import "./Main.css";
 
 import SearchRow from "../SearchRow/SearchRow";
 import ResultRows from "../ResultRows/ResultRows";
+import { AddKeyBtnState } from "../Common/Types";
 
 type MainState = {
   filteredKeys: string[];
   allKeys: string[];
   selectedID: number;
+  addOrSave: AddKeyBtnState;
 };
 
 class Main extends React.Component<{}, MainState> {
-  state = { filteredKeys: [], allKeys: [], selectedID: 0 };
+  state = {
+    filteredKeys: [],
+    allKeys: [],
+    selectedID: 0,
+    addOrSave: AddKeyBtnState.Add,
+  };
   async readAllKeys() {
     const allKeys = await window.eRPC.getKeys();
     console.log(`Updating from DB. Retrieved ${allKeys.length} keys from DB`);
@@ -48,6 +55,14 @@ class Main extends React.Component<{}, MainState> {
     }
   };
 
+  saveKey = () => {
+    console.log("Key saved");
+    this.setState({ addOrSave: AddKeyBtnState.Add });
+  };
+  showAddKey = () => {
+    this.setState({ addOrSave: AddKeyBtnState.Save });
+  };
+
   render() {
     return (
       <div className="main">
@@ -55,6 +70,9 @@ class Main extends React.Component<{}, MainState> {
           filterKeys={this.filterKeys}
           moveUp={this.moveSelectorUp}
           moveDown={this.moveSelectorDown}
+          addOrSave={this.state.addOrSave}
+          saveKey={this.saveKey}
+          showAddKey={this.showAddKey}
         />
         <div className="delimiter"></div>
         <ResultRows
