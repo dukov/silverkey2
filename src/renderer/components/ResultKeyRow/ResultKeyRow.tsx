@@ -8,6 +8,7 @@ import { ResultKeyProps } from "../Common/Types";
 
 type ResultKeyRowExtra = {
   selected: boolean;
+  doRemoveKey: (k: string) => void;
 };
 
 type ResultKeyRowProps = ResultKeyProps & ResultKeyRowExtra;
@@ -21,7 +22,10 @@ class ResultKeyRow extends React.Component<ResultKeyRowProps> {
     return (
       <div className={classes}>
         <ResultKeyBtn searchKey={this.props.searchKey} />
-        <RemoveKeyBtn searchKey={this.props.searchKey} />
+        <RemoveKeyBtn
+          searchKey={this.props.searchKey}
+          doRemoveKey={this.props.doRemoveKey}
+        />
       </div>
     );
   }

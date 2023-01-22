@@ -10,7 +10,6 @@ import ValueInput from "../ValueInput/ValueInput";
 type MainState = {
   searchVal: string;
   filteredKeys: string[];
-  allKeys: string[];
   selectedID: number;
   addOrSave: AddKeyBtnState;
   valueToAdd: string;
@@ -25,25 +24,29 @@ class Main extends React.Component<{}, MainState> {
     addOrSave: AddKeyBtnState.Add,
     valueToAdd: "",
   };
+  allKeys: string[] = [];
   async readAllKeys(): Promise<string[]> {
     const allKeys = await window.eRPC.getKeys();
     console.log(`Updating from DB. Retrieved ${allKeys.length} keys from DB`);
     return allKeys;
   }
   async componentDidMount() {
-    const all_keys = await this.readAllKeys();
-    this.setState({ allKeys: all_keys });
+    this.allKeys = await this.readAllKeys();
   }
 
+  private _filterKeys = (flt: string): string[] => {
+    if (flt == "") return [];
+    const searchText = flt.toUpperCase();
+    return this.allKeys.filter(
+      (key: string) => key.toUpperCase().indexOf(searchText) > -1
+    );
+  };
+
   filterKeys = (flt: string) => {
-    let filtered: string[] = [];
-    if (flt != "" && this.state.addOrSave == AddKeyBtnState.Add) {
-      const searchText = flt.toUpperCase();
-      filtered = this.state.allKeys.filter(
-        (key: string) => key.toUpperCase().indexOf(searchText) > -1
-      );
+    if (this.state.addOrSave == AddKeyBtnState.Add) {
+      const filtered = this._filterKeys(flt);
+      this.setState({ filteredKeys: filtered, searchVal: flt });
     }
-    this.setState({ filteredKeys: filtered, searchVal: flt });
   };
 
   moveSelectorUp = () => {
@@ -67,13 +70,20 @@ class Main extends React.Component<{}, MainState> {
       return;
     }
     await window.eRPC.setValue(this.state.searchVal, this.state.valueToAdd);
-    const all_keys = await this.readAllKeys();
+    this.allKeys = await this.readAllKeys();
     this.setState({
       addOrSave: AddKeyBtnState.Add,
       valueToAdd: "",
-      allKeys: all_keys,
     });
   };
+
+  removeKey = async (k: string) => {
+    await window.eRPC.deleteKey(k);
+    this.allKeys = await this.readAllKeys();
+    const filtered = this._filterKeys(this.state.searchVal);
+    this.setState({ filteredKeys: filtered, selectedID: 0 });
+  };
+
   showAddKey = () => {
     this.setState({ addOrSave: AddKeyBtnState.Save });
   };
@@ -89,6 +99,7 @@ class Main extends React.Component<{}, MainState> {
         <ResultRows
           resultKeys={this.state.filteredKeys}
           selected_idx={this.state.selectedID}
+          doRemoveKey={this.removeKey}
         />
       );
     } else {

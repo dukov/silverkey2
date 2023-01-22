@@ -4,11 +4,18 @@ import "./RemoveKeyBtn.css";
 
 import { ResultKeyProps } from "../Common/Types";
 
-class RemoveKeyBtn extends React.Component<ResultKeyProps> {
+type RemoveKeyBtnProps = ResultKeyProps & {
+  doRemoveKey: (k: string) => void;
+};
+
+class RemoveKeyBtn extends React.Component<RemoveKeyBtnProps> {
+  onClick = () => {
+    this.props.doRemoveKey(this.props.searchKey);
+  };
   render() {
     return (
       <div className="result-key-remove">
-        <a href="#" className="remove-key-lnk">
+        <a href="#" className="remove-key-lnk" onClick={this.onClick}>
           -
         </a>
       </div>
