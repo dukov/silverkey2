@@ -5,12 +5,14 @@ import "./Main.css";
 import SearchRow from "../SearchRow/SearchRow";
 import ResultRows from "../ResultRows/ResultRows";
 import { AddKeyBtnState } from "../Common/Types";
+import ValueInput from "../ValueInput/ValueInput";
 
 type MainState = {
   filteredKeys: string[];
   allKeys: string[];
   selectedID: number;
   addOrSave: AddKeyBtnState;
+  valueToAdd: string;
 };
 
 class Main extends React.Component<{}, MainState> {
@@ -19,6 +21,7 @@ class Main extends React.Component<{}, MainState> {
     allKeys: [],
     selectedID: 0,
     addOrSave: AddKeyBtnState.Add,
+    valueToAdd: "",
   };
   async readAllKeys() {
     const allKeys = await window.eRPC.getKeys();
@@ -57,13 +60,34 @@ class Main extends React.Component<{}, MainState> {
 
   saveKey = () => {
     console.log("Key saved");
-    this.setState({ addOrSave: AddKeyBtnState.Add });
+    this.setState({ addOrSave: AddKeyBtnState.Add, valueToAdd: "" });
   };
   showAddKey = () => {
     this.setState({ addOrSave: AddKeyBtnState.Save });
   };
 
+  updateValueToAdd = (newValue: string) => {
+    this.setState({ valueToAdd: newValue });
+  };
+
   render() {
+    let res = undefined;
+    if (this.state.addOrSave == AddKeyBtnState.Add) {
+      res = (
+        <ResultRows
+          resultKeys={this.state.filteredKeys}
+          selected_idx={this.state.selectedID}
+        />
+      );
+    } else {
+      res = (
+        <ValueInput
+          value={this.state.valueToAdd}
+          updateValue={this.updateValueToAdd}
+        />
+      );
+    }
+
     return (
       <div className="main">
         <SearchRow
@@ -75,10 +99,7 @@ class Main extends React.Component<{}, MainState> {
           showAddKey={this.showAddKey}
         />
         <div className="delimiter"></div>
-        <ResultRows
-          resultKeys={this.state.filteredKeys}
-          selected_idx={this.state.selectedID}
-        />
+        {res}
         <div className="footer"></div>
       </div>
     );
