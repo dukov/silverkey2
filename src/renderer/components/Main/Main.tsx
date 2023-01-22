@@ -71,9 +71,11 @@ class Main extends React.Component<{}, MainState> {
     }
     await window.eRPC.setValue(this.state.searchVal, this.state.valueToAdd);
     this.allKeys = await this.readAllKeys();
+    const filtered = this._filterKeys(this.state.searchVal);
     this.setState({
       addOrSave: AddKeyBtnState.Add,
       valueToAdd: "",
+      filteredKeys: filtered,
     });
   };
 
