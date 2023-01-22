@@ -31,6 +31,7 @@ class SearchInput extends React.Component<SearchInputProps> {
         <input
           type="text"
           className="search-key"
+          autoFocus
           id="search-input"
           value={this.props.searchVal}
           onKeyUp={this.processKeyUp}
