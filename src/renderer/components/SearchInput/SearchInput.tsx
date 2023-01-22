@@ -15,7 +15,10 @@ class SearchInput extends React.Component<SearchInputProps> {
       ArrowUp: this.props.moveUp,
       ArrowDown: this.props.moveDown,
     };
-    if (actionMap[evt.key] != undefined) {
+    if (evt.key == "Escape") {
+      window.close();
+      return;
+    } else if (actionMap[evt.key] != undefined) {
       actionMap[evt.key]();
     }
   };
