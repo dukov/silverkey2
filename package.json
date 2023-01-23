@@ -9,11 +9,14 @@
   "devDependencies": {
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
+    "@typescript-eslint/eslint-plugin": "^5.48.2",
+    "@typescript-eslint/parser": "^5.48.2",
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.3",
     "electron": "^22.0.3",
     "electron-builder": "^23.6.0",
+    "eslint": "^8.32.0",
     "html-webpack-plugin": "^5.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -24,6 +27,7 @@
     "webpack-cli": "^5.0.1"
   },
   "scripts": {
+    "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "webpack --config ./webpack.config.js",
     "start": "yarn run build && electron .",
     "pack": "electron-builder --dir",

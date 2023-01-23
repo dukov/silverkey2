@@ -7,7 +7,7 @@ import ResultKeyRow from "../ResultKeyRow/ResultKeyRow";
 type ResultRowsProp = {
   resultKeys: string[];
   selected_idx: number;
-  doRemoveKey: (k: string) => void;
+  doRemoveKey: (k: string) => Promise<void>;
 };
 
 class ResultRows extends React.Component<ResultRowsProp> {

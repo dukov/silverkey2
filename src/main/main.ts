@@ -39,7 +39,7 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile(join(rendererDir, "index.html"));
+  void mainWindow.loadFile(join(rendererDir, "index.html"));
 
   // Open the DevTools.
   if (!app.isPackaged) mainWindow.webContents.openDevTools();
@@ -76,7 +76,7 @@ const createTray = async () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app
+void app
   .whenReady()
   .then(() => {
     globalShortcut.register("Alt+CommandOrControl+I", () => {
@@ -89,7 +89,7 @@ app
   })
   .then(() => {
     createWindow();
-    createTray();
+    void createTray();
 
     app.on("activate", () => {
       // On macOS it's common to re-create a window in the app when the
@@ -113,23 +113,23 @@ const userData = app.getPath("userData");
 console.log("User data dir", userData);
 const db = new FileDB(join(userData, "kvdb.json"));
 
-ipcMain.handle("get-keys", async (evt, data) => {
+ipcMain.handle("get-keys", () => {
   return db.getKeys();
 });
 
-ipcMain.handle("get-val", async (evt, key) => {
+ipcMain.handle("get-val", (_, key: string) => {
   return db.getValue(key);
 });
 
-ipcMain.handle("set-val", async (evt, key, value) => {
+ipcMain.handle("set-val", (_, key: string, value: string) => {
   return db.setValue(key, value);
 });
 
-ipcMain.handle("delete-key", async (evt, key) => {
+ipcMain.handle("delete-key", (_, key: string) => {
   return db.deleteKey(key);
 });
 
-ipcMain.handle("app-hide", async (evt) => {
+ipcMain.handle("app-hide", () => {
   if (process.platform == "darwin") {
     app.hide();
   } else {

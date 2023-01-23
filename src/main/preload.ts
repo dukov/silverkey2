@@ -1,7 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 
 const electronRPC = {
-  getKeys: (): Promise<string[]> => ipcRenderer.invoke("get-keys"),
+  getKeys: (): Promise<string[]> =>
+    ipcRenderer.invoke("get-keys") as Promise<string[]>,
   getValue: (key: string) => ipcRenderer.invoke("get-val", key),
   setValue: (key: string, value: string) =>
     ipcRenderer.invoke("set-val", key, value),

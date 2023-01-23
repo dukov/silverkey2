@@ -8,7 +8,7 @@ import { ResultKeyProps } from "../Common/Types";
 
 type ResultKeyRowExtra = {
   selected: boolean;
-  doRemoveKey: (k: string) => void;
+  doRemoveKey: (k: string) => Promise<void>;
 };
 
 type ResultKeyRowProps = ResultKeyProps & ResultKeyRowExtra;

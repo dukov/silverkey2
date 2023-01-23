@@ -9,7 +9,7 @@ import { AddKeyBtnState } from "../Common/Types";
 type SearchRowExt = {
   searchVal: string;
   addOrSave: AddKeyBtnState;
-  saveKey: () => void;
+  saveKey: () => Promise<void>;
   showAddKey: () => void;
 };
 
