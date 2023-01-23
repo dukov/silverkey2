@@ -31,9 +31,13 @@
     "build": "webpack --config ./webpack.config.js",
     "start": "yarn run build && electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "yarn run build && electron-builder"
   },
   "build": {
+    "files": [
+      "./dist/main/**",
+      "./dist/renderer/**"
+    ],
     "appId": "com.electron.silverkey2",
     "mac": {
       "category": "public.app-category.productivity",

@@ -10,11 +10,17 @@ type AddKeyBtnProp = {
 };
 
 class AddKeyBtn extends React.Component<AddKeyBtnProp> {
-  processOnClick = async () => {
+  processOnClick = () => {
     if (this.props.addOrSave == AddKeyBtnState.Add) {
       this.props.showAddKey();
     } else if (this.props.addOrSave == AddKeyBtnState.Save) {
-      await this.props.saveKey();
+      // Use IIFE format to perform await in non async function
+      //Promises must be awaited, end with a call to .catch, end with
+      //a call to .then with a rejection handler or be explicitly marked
+      //as ignored with the `void` operator
+      void (async () => {
+        await this.props.saveKey();
+      })();
     }
   };
   render() {
@@ -28,7 +34,7 @@ class AddKeyBtn extends React.Component<AddKeyBtnProp> {
           href="#"
           className="add-save-key"
           id="add-key"
-          onClick={void this.processOnClick}
+          onClick={this.processOnClick}
         >
           {buttonStates[this.props.addOrSave]}
         </a>

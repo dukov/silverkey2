@@ -42,7 +42,8 @@ const createWindow = () => {
   void mainWindow.loadFile(join(rendererDir, "index.html"));
 
   // Open the DevTools.
-  if (!app.isPackaged) mainWindow.webContents.openDevTools();
+  if (process.env.DEBUG == "true" || !app.isPackaged)
+    mainWindow.webContents.openDevTools();
 };
 
 const createTray = async () => {
