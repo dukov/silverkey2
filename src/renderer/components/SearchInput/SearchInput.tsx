@@ -19,6 +19,7 @@ class SearchInput extends React.Component<SearchInputProps> {
     if (evt.key == "Escape") {
       window.close();
     } else if (evt.key == "Enter") {
+      if (this.props.selectedKey == "") return;
       void (async () => {
         const val = await window.eRPC.getValue(this.props.selectedKey);
         await navigator.clipboard.writeText(val);
