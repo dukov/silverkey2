@@ -4,6 +4,7 @@ import "./SearchInput.css";
 
 export type SearchInputProps = {
   searchVal: string;
+  selectedKey: string;
   filterKeys: (flt: string) => void;
   moveUp: () => void;
   moveDown: () => void;
@@ -17,7 +18,13 @@ class SearchInput extends React.Component<SearchInputProps> {
     };
     if (evt.key == "Escape") {
       window.close();
-      return;
+    } else if (evt.key == "Enter") {
+      void (async () => {
+        const val = await window.eRPC.getValue(this.props.selectedKey);
+        await navigator.clipboard.writeText(val);
+        await window.eRPC.appHide();
+        window.close();
+      })();
     } else if (actionMap[evt.key] != undefined) {
       actionMap[evt.key]();
     }

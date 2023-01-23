@@ -117,6 +117,7 @@ class Main extends React.Component<{}, MainState> {
       <div className="main">
         <SearchRow
           searchVal={this.state.searchVal}
+          selectedKey={this.state.filteredKeys[this.state.selectedID]}
           filterKeys={this.filterKeys}
           moveUp={this.moveSelectorUp}
           moveDown={this.moveSelectorDown}
