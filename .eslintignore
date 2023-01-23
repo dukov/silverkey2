@@ -34,5 +34,4 @@ npm-debug.log.*
 
 dist/*
 .eslintrc.js
-renderer.js
 webpack.config.js
