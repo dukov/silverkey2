@@ -6,15 +6,16 @@ import ResultKeyRow from "../ResultKeyRow/ResultKeyRow";
 
 type ResultRowsProp = {
   resultKeys: string[];
-  selected_idx: number;
+  selected_idx: number | null;
   doRemoveKey: (k: string) => Promise<void>;
+  deSelectAll: () => void;
 };
 
 class ResultRows extends React.Component<ResultRowsProp> {
   render(): React.ReactNode {
     const rows = this.props.resultKeys.map((resultKey, idx) => {
       let sel = false;
-      if (this.props.selected_idx == idx) {
+      if (this.props.selected_idx != null && this.props.selected_idx == idx) {
         sel = true;
       }
       return (
@@ -27,7 +28,11 @@ class ResultRows extends React.Component<ResultRowsProp> {
       );
     });
     return (
-      <div className="result-rows" id="result-rows">
+      <div
+        className="result-rows"
+        id="result-rows"
+        onMouseEnter={this.props.deSelectAll}
+      >
         {rows}
       </div>
     );

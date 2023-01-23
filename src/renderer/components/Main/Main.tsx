@@ -10,7 +10,7 @@ import ValueInput from "../ValueInput/ValueInput";
 type MainState = {
   searchVal: string;
   filteredKeys: string[];
-  selectedID: number;
+  selectedID: number | null;
   addOrSave: AddKeyBtnState;
   valueToAdd: string;
 };
@@ -49,15 +49,19 @@ class Main extends React.Component<{}, MainState> {
     }
   };
 
+  deSelectAll = () => {
+    this.setState({ selectedID: null });
+  };
+
   moveSelectorUp = () => {
-    let curID = this.state.selectedID;
+    let curID = this.state.selectedID != null ? this.state.selectedID : 0;
     if (curID > 0) {
       curID--;
       this.setState({ selectedID: curID });
     }
   };
   moveSelectorDown = () => {
-    let curID = this.state.selectedID;
+    let curID = this.state.selectedID != null ? this.state.selectedID : -1;
     if (curID < this.state.filteredKeys.length - 1) {
       curID++;
       this.setState({ selectedID: curID });
@@ -87,7 +91,8 @@ class Main extends React.Component<{}, MainState> {
   };
 
   showAddKey = () => {
-    this.setState({ addOrSave: AddKeyBtnState.Save });
+    // Switching to 'add value' mode. need to drop selected id
+    this.setState({ addOrSave: AddKeyBtnState.Save, selectedID: null });
   };
 
   updateValueToAdd = (newValue: string) => {
@@ -102,6 +107,7 @@ class Main extends React.Component<{}, MainState> {
           resultKeys={this.state.filteredKeys}
           selected_idx={this.state.selectedID}
           doRemoveKey={this.removeKey}
+          deSelectAll={this.deSelectAll}
         />
       );
     } else {
@@ -117,7 +123,12 @@ class Main extends React.Component<{}, MainState> {
       <div className="main">
         <SearchRow
           searchVal={this.state.searchVal}
-          selectedKey={this.state.filteredKeys[this.state.selectedID]}
+          selectedKey={
+            // Selected key is empty if selected id null
+            this.state.selectedID != null
+              ? this.state.filteredKeys[this.state.selectedID]
+              : ""
+          }
           filterKeys={this.filterKeys}
           moveUp={this.moveSelectorUp}
           moveDown={this.moveSelectorDown}
