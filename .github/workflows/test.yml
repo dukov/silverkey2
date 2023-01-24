@@ -29,5 +29,11 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: yarn test
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           yarn lint
+
+      - name: yarn build
+        run: |
+          yarn build
+
