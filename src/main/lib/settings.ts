@@ -1,21 +1,55 @@
 import * as fs from "fs";
 
-export enum UpdateSource {
+enum UpdateSource {
   github,
 }
 
-export interface UpdateSourceConfig {
-  updateSource: UpdateSource;
-  user: string;
-  repo: string;
-  password?: string;
+interface SingleSetting<T> {
+  value: T;
+  description: string;
+}
+
+interface UpdateSourceConfig {
+  updateSource: SingleSetting<UpdateSource>;
+  user: SingleSetting<string>;
+  repo: SingleSetting<string>;
+  password?: SingleSetting<string>;
 }
 
 export interface Settings {
-  checkUpdates: boolean;
-  useNonReleasedVersions: boolean;
-  updateSourceConfig: UpdateSourceConfig;
+  checkUpdates: SingleSetting<boolean>;
+  useNonReleasedVersions: SingleSetting<boolean>;
+  updateSourceConfig?: SingleSetting<UpdateSourceConfig>;
 }
+
+const DEFAULT_SETTINGS: Settings = {
+  checkUpdates: {
+    value: false,
+    description: "Enable automatic updates",
+  },
+  useNonReleasedVersions: {
+    value: false,
+    description: "Use artifacts from main brunch",
+  },
+  updateSourceConfig: {
+    description: "Artifact Source",
+    value: {
+      updateSource: {
+        value: UpdateSource.github,
+        description: "Type",
+      },
+      user: {
+        value: "dukov",
+        description: "User",
+      },
+      repo: {
+        value: "silverkey2",
+        description: "Repository",
+      },
+    },
+  },
+};
+
 export class SettingsHandler {
   settings: Settings;
   path: string;
@@ -24,15 +58,7 @@ export class SettingsHandler {
     try {
       this.settings = this._load(this.path);
     } catch (err) {
-      this.settings = {
-        checkUpdates: false,
-        useNonReleasedVersions: false,
-        updateSourceConfig: {
-          updateSource: UpdateSource.github,
-          user: "dukov",
-          repo: "silverkey2",
-        },
-      };
+      this.settings = DEFAULT_SETTINGS;
     }
   }
   private _load(path: string): Settings {
