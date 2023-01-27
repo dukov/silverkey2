@@ -14,6 +14,7 @@ import {
 import { join } from "path";
 
 import { FileDB } from "./lib/localdb/filedb";
+import { SettingsHandler } from "./lib/settings";
 
 const assetsDirectory = app.isPackaged
   ? join(process.resourcesPath, "assets")
@@ -113,6 +114,7 @@ app.on("window-all-closed", () => {
 const userData = app.getPath("userData");
 console.log("User data dir", userData);
 const db = new FileDB(join(userData, "kvdb.json"));
+const settings = new SettingsHandler(join(userData, "skSettings.json"));
 
 ipcMain.handle("get-keys", () => {
   return db.getKeys();
