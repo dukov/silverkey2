@@ -9,6 +9,7 @@ const electronRPC = {
     ipcRenderer.invoke("set-val", key, value),
   deleteKey: (key: string) => ipcRenderer.invoke("delete-key", key),
   appHide: () => ipcRenderer.invoke("app-hide"),
+  isSettings: (cb: () => void) => ipcRenderer.on("show-settings", cb),
 };
 
 contextBridge.exposeInMainWorld("eRPC", electronRPC);

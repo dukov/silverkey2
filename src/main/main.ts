@@ -45,6 +45,7 @@ const createWindow = () => {
   // Open the DevTools.
   if (process.env.DEBUG == "true" || !app.isPackaged)
     mainWindow.webContents.openDevTools();
+  return mainWindow;
 };
 
 const createTray = async () => {
@@ -62,6 +63,15 @@ const createTray = async () => {
     {
       label: "Settings",
       type: "normal",
+      click: () => {
+        let win = null;
+        if (!mainWindow) {
+          win = createWindow();
+        } else {
+          win = mainWindow;
+        }
+        win.webContents.send("show-settings");
+      },
     },
     {
       label: "Quit",
