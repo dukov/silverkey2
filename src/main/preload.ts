@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { Settings } from "./lib/settings";
 
 const electronRPC = {
   getKeys: (): Promise<string[]> =>
@@ -10,6 +11,10 @@ const electronRPC = {
   deleteKey: (key: string) => ipcRenderer.invoke("delete-key", key),
   appHide: () => ipcRenderer.invoke("app-hide"),
   isSettings: (cb: () => void) => ipcRenderer.on("show-settings", cb),
+  getSettings: (): Promise<Settings> => {
+    console.log("Requesting settings");
+    return ipcRenderer.invoke("get-settings") as Promise<Settings>;
+  },
 };
 
 contextBridge.exposeInMainWorld("eRPC", electronRPC);
