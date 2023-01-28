@@ -6,20 +6,20 @@ import "./Settings.css";
 type T = any;
 
 type SettingsState = {
-  settings: Settings | null;
+  settings: Settings;
 };
 
-type SettingsProps = {};
+type SettingsProps = {
+  settings: Settings;
+};
 
 class SettingsMain extends React.Component<SettingsProps, SettingsState> {
   state = {
-    settings: null,
+    settings: this.props.settings,
   };
   async componentDidMount(): Promise<void> {
-    if (this.state.settings == null) {
-      const settings = await window.eRPC.getSettings();
-      this.setState({ settings: settings });
-    }
+    const settings = await window.eRPC.getSettings();
+    this.setState({ settings: settings });
   }
 
   createSingleSetting(key: string, setting: SingleSetting<T>): JSX.Element {
@@ -69,9 +69,6 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
 
   renderSettings(): JSX.Element[] {
     let res: JSX.Element[] = [];
-    if (this.state.settings == null) {
-      return res;
-    }
     for (const [k, v] of Object.entries(this.state.settings)) {
       res.push(this.createSingleSetting(k, v as SingleSetting<T>));
     }
@@ -79,9 +76,6 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
   }
 
   onInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    if (this.state.settings == null) {
-      return;
-    }
     const keypath = (evt.target.dataset["key"] as string).split(" ");
     let origSettings = structuredClone(this.state.settings) as any;
     let settings = origSettings;
@@ -103,6 +97,13 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
 
     this.setState({ settings: origSettings });
   };
+  onSaveSettings = async () => {
+    await window.eRPC.saveSettings(this.state.settings);
+    location.reload();
+  };
+  cancelSaveSettings = async () => {
+    location.reload();
+  };
   render(): React.ReactNode {
     console.log("Start Rendering");
     let settings: JSX.Element[] = [];
@@ -114,10 +115,14 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
         {settings}
         <div className="setting-buttons">
           <div className="save-button">
-            <a href="#">{saveBtn}</a>
+            <a href="#" onClick={this.onSaveSettings}>
+              {saveBtn}
+            </a>
           </div>
           <div className="cancel-button">
-            <a href="#">{cancelBtn}</a>
+            <a href="#" onClick={this.cancelSaveSettings}>
+              {cancelBtn}
+            </a>
           </div>
         </div>
       </div>
