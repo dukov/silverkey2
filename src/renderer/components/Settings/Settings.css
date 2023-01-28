@@ -1,0 +1,65 @@
+body {
+  background-color: #f1f1f1;
+}
+
+.settingsMain {
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-group {
+  display: flex;
+  border: 1px solid gray;
+  border-radius: 10px;
+  flex-direction: column;
+}
+
+.settings-group-content {
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+}
+
+.single-setting {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: 30px;
+}
+
+.setting-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.settings-desc {
+  padding-right: 12px;
+  margin-left: 10px;
+  font-weight: 400;
+  font-size: 1rem;
+}
+.settings-text{
+  margin-left: auto;
+  flex-grow: 2;
+}
+
+.settings-text input {
+  width: 100%;
+  background: transparent;
+  border: 1px solid #a49fb2;
+  border-radius: 0.25rem;
+  font-weight: 400;
+  font-size: 1rem;
+  outline: none;
+}
+
+.save-button a {
+  text-decoration: none;
+  font-size: xx-large;
+}
+
+.cancel-button a {
+  text-decoration: none;
+  font-size: xx-large;
+}
