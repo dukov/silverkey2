@@ -125,6 +125,7 @@ const userData = app.getPath("userData");
 console.log("User data dir", userData);
 const db = new FileDB(join(userData, "kvdb.json"));
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
+console.log("Settings loaded", settings.settings);
 
 ipcMain.handle("get-keys", () => {
   return db.getKeys();
@@ -150,4 +151,9 @@ ipcMain.handle("app-hide", () => {
       mainWindow.close();
     }
   }
+});
+
+ipcMain.handle("get-settings", () => {
+  console.log("Got settings request. Returning", settings.settings);
+  return settings.settings;
 });

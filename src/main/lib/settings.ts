@@ -4,7 +4,7 @@ enum UpdateSource {
   github,
 }
 
-interface SingleSetting<T> {
+export interface SingleSetting<T> {
   value: T;
   description: string;
 }
