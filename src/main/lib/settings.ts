@@ -1,7 +1,7 @@
 import * as fs from "fs";
 
 enum UpdateSource {
-  github,
+  github = "github",
 }
 
 export interface SingleSetting<T> {

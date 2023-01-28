@@ -10,7 +10,6 @@ const root = createRoot(app);
 
 let isSettings = false;
 window.eRPC.isSettings(() => {
-  console.log("got event show settings");
   root.render(<Settings />);
 });
 
