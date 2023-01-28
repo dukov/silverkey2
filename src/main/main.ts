@@ -14,7 +14,7 @@ import {
 import { join } from "path";
 
 import { FileDB } from "./lib/localdb/filedb";
-import { SettingsHandler } from "./lib/settings";
+import { Settings, SettingsHandler } from "./lib/settings";
 
 const assetsDirectory = app.isPackaged
   ? join(process.resourcesPath, "assets")
@@ -70,7 +70,7 @@ const createTray = async () => {
         } else {
           win = mainWindow;
         }
-        win.webContents.send("show-settings");
+        win.webContents.send("show-settings", settings.settings);
       },
     },
     {
@@ -154,6 +154,11 @@ ipcMain.handle("app-hide", () => {
 });
 
 ipcMain.handle("get-settings", () => {
-  console.log("Got settings request. Returning", settings.settings);
   return settings.settings;
+});
+
+ipcMain.handle("save-settings", (_, newSettings: Settings) => {
+  settings.settings = newSettings;
+  settings.save();
+  console.log("Settings saved");
 });
