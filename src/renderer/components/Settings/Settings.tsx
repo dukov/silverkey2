@@ -1,6 +1,8 @@
 import { SingleSetting, Settings } from "main/lib/settings";
 import React from "react";
 
+import "./Settings.css";
+
 type T = any;
 
 type SettingsState = {
@@ -26,20 +28,26 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
       }
       return (
         <div className="settings-group" key={key}>
-          {setting.description}
-          {subList}
+          <div className="settings-desc">{setting.description}</div>
+          <div className="settings-group-content">{subList}</div>
         </div>
       );
     } else if (typeof setting.value == "boolean") {
       return (
         <div className="single-setting" key={key}>
-          {setting.description} <input type="checkbox" />
+          <div className="settings-desc">{setting.description}</div>
+          <div className="settings-checkbox">
+            <input type="checkbox" />
+          </div>
         </div>
       );
     } else {
       return (
         <div className="single-setting" key={key}>
-          {setting.description} <input type="text" />
+          <div className="settings-desc">{setting.description}</div>
+          <div className="settings-text">
+            <input type="text" />
+          </div>
         </div>
       );
     }
@@ -61,15 +69,17 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
     let settings: JSX.Element[] = [];
     settings = this.renderSettings();
     console.log("Rendered settings", settings);
+    const saveBtn = "\u2714\uFE0F";
+    const cancelBtn = "\u274C";
     return (
       <div className="settingsMain">
         {settings}
         <div className="setting-buttons">
           <div className="save-button">
-            <a href="#">Save</a>
+            <a href="#">{saveBtn}</a>
           </div>
           <div className="cancel-button">
-            <a href="#">Cancel</a>
+            <a href="#">{cancelBtn}</a>
           </div>
         </div>
       </div>
