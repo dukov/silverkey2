@@ -6,6 +6,7 @@ module.exports = [
     entry: {
       main: "./src/main/main.ts",
       preload: "./src/main/preload.ts",
+      updater: "./src/main/updater.ts",
     },
     target: "electron-main",
     resolve: {

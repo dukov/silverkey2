@@ -10,6 +10,8 @@ import {
   Menu,
   globalShortcut,
   NativeImage,
+  utilityProcess,
+  UtilityProcess,
 } from "electron";
 import { join } from "path";
 
@@ -26,6 +28,7 @@ if (process.platform == "darwin") app.dock.hide();
 
 let tray: Tray | null = null;
 let mainWindow: BrowserWindow | null = null;
+let updater: UtilityProcess | null = null;
 
 const createWindow = () => {
   // Create the browser window.
@@ -85,6 +88,18 @@ const createTray = async () => {
   tray.setContextMenu(contextMenu);
 };
 
+const runUpdater = () => {
+  if (updater != null) return;
+  updater = utilityProcess.fork(join(__dirname, "updater.js"));
+  updater.on("spawn", () => {
+    console.log("Updater started");
+    updater?.postMessage({ message: "config-file", path: settings.path });
+  });
+  updater.on("exit", () => {
+    console.log("Updater stopped");
+  });
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -125,7 +140,10 @@ const userData = app.getPath("userData");
 console.log("User data dir", userData);
 const db = new FileDB(join(userData, "kvdb.json"));
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
-console.log("Settings loaded", settings.settings);
+console.log("Settings loaded");
+if (settings.settings.checkUpdates) {
+  runUpdater();
+}
 
 ipcMain.handle("get-keys", () => {
   return db.getKeys();
@@ -161,4 +179,11 @@ ipcMain.handle("save-settings", (_, newSettings: Settings) => {
   settings.settings = newSettings;
   settings.save();
   console.log("Settings saved");
+  if (settings.settings.checkUpdates) {
+    if (updater == null) {
+      runUpdater();
+    } else {
+      updater.postMessage({ message: "reload-config" });
+    }
+  }
 });
