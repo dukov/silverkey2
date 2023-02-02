@@ -46,6 +46,10 @@ const DEFAULT_SETTINGS: Settings = {
         value: "silverkey2",
         description: "Repository",
       },
+      password: {
+        value: "",
+        description: "Password or Token",
+      },
     },
   },
 };
