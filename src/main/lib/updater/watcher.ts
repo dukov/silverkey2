@@ -20,6 +20,8 @@ export class UpdateWatcher {
   artifact: string;
   savePath: string;
   private lastDownloadedVersion?: string;
+  private intervalID: NodeJS.Timer | undefined;
+  private lock: boolean = false;
   constructor(config: WatcherConfig) {
     this.artifact = config.artifactName;
     this.currentVersion = config.currentVersion;
@@ -32,42 +34,60 @@ export class UpdateWatcher {
     );
   }
 
-  private sleep(ms: number) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve("");
-      }, ms);
-    });
+  stop() {
+    if (this.intervalID != undefined) {
+      clearInterval(this.intervalID);
+      this.intervalID = undefined;
+    }
   }
-  async run() {
+  run() {
     console.log("Starting artifact watcher");
-    while (true) {
-      await this.sleep(this.interval);
-      let lastArtifact = await this.artifactClient.getLastArtifact(
-        this.artifact
-      );
-      console.log(lastArtifact);
-      if (lastArtifact == null) {
-        console.log("No artifact found. Sleeping");
-        continue;
-      }
-      if (lastArtifact.version == this.lastDownloadedVersion) {
-        console.log(lastArtifact.version, this.lastDownloadedVersion);
-        console.log("Artifact already downloaded. Sleeping");
-        continue;
-      }
-      if (lastArtifact.version == this.currentVersion) {
-        console.log("No new artifact. Seeping");
-        continue;
-      }
+    this.intervalID = setInterval(this.check, this.interval);
+  }
 
-      console.log("Found new artifact. Downloading");
+  check = async () => {
+    if (this.lock) {
+      console.log("Check/Download in progress. Skipping this iteration");
+      return;
+    }
+    this.lock = true;
+    await this._check();
+    this.lock = false;
+  };
+
+  private _check = async () => {
+    let lastArtifact = await this.artifactClient.getLastArtifact(this.artifact);
+    if (lastArtifact == null) {
+      console.log("No artifact found. Sleeping");
+      return;
+    }
+    if (lastArtifact.version == this.lastDownloadedVersion) {
+      console.log("Artifact already downloaded. Sleeping");
+      return;
+    }
+    if (lastArtifact.version == this.currentVersion) {
+      console.log("No new artifact. Seeping");
+      return;
+    }
+
+    console.log("Found new artifact. Downloading");
+    try {
       fs.rmSync(this.savePath, { recursive: true });
+    } catch (e) {
+      if (e instanceof Error && e.message.indexOf("ENOENT") != -1) {
+        console.log("Artifact download dir does tno exists. Skipping removal");
+      } else {
+        throw e;
+      }
+    }
+    try {
       await this.artifactClient.downloadArtifact(
         lastArtifact.id,
         this.savePath
       );
       this.lastDownloadedVersion = lastArtifact.version;
+    } catch (e) {
+      console.log("Failed to download");
     }
-  }
+  };
 }
