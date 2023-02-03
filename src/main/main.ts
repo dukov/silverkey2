@@ -13,10 +13,12 @@ import {
   utilityProcess,
   UtilityProcess,
 } from "electron";
+
 import { join } from "path";
 
 import { FileDB } from "./lib/localdb/filedb";
 import { Settings, SettingsHandler } from "./lib/settings";
+import { installPackage } from "./lib/updater/installer";
 
 const assetsDirectory = app.isPackaged
   ? join(process.resourcesPath, "assets")
@@ -97,6 +99,12 @@ const runUpdater = () => {
   });
   updater.on("exit", () => {
     console.log("Updater stopped");
+  });
+  updater.on("message", (e) => {
+    if (e.message == "install-update") {
+      installPackage(e.path);
+      app.quit();
+    }
   });
 };
 

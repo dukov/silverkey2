@@ -11,6 +11,7 @@ type WatcherConfig = {
   owner: string;
   repo: string;
   token: string;
+  installCallBack: (path: string) => void;
 };
 
 export class UpdateWatcher {
@@ -19,6 +20,7 @@ export class UpdateWatcher {
   artifactClient: ArtifactSourceClient;
   artifact: string;
   savePath: string;
+  installCb: (path: string) => void;
   private lastDownloadedVersion?: string;
   private intervalID: NodeJS.Timer | undefined;
   private lock: boolean = false;
@@ -27,11 +29,16 @@ export class UpdateWatcher {
     this.currentVersion = config.currentVersion;
     this.interval = config.checkInterval;
     this.savePath = config.savePath;
+    this.installCb = config.installCallBack;
     this.artifactClient = new GitHubClient(
       config.owner,
       config.repo,
       config.token
     );
+
+    this.artifactClient.on("extracted", (files: string[]) => {
+      this.installCb(files[0]);
+    });
   }
 
   stop() {
@@ -81,7 +88,7 @@ export class UpdateWatcher {
       }
     }
     try {
-      await this.artifactClient.downloadArtifact(
+      const artifactBinaries = await this.artifactClient.downloadArtifact(
         lastArtifact.id,
         this.savePath
       );
