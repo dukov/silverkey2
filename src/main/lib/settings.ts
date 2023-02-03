@@ -18,7 +18,6 @@ interface UpdateSourceConfig {
 
 export interface Settings {
   checkUpdates: SingleSetting<boolean>;
-  useNonReleasedVersions: SingleSetting<boolean>;
   updateSourceConfig?: SingleSetting<UpdateSourceConfig>;
 }
 
@@ -26,10 +25,6 @@ const DEFAULT_SETTINGS: Settings = {
   checkUpdates: {
     value: false,
     description: "Enable automatic updates",
-  },
-  useNonReleasedVersions: {
-    value: false,
-    description: "Use artifacts from main brunch",
   },
   updateSourceConfig: {
     description: "Artifact Source",
