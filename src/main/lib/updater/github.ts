@@ -1,3 +1,5 @@
+import EventEmitter from "events";
+
 import { Octokit } from "octokit";
 import { components } from "@octokit/openapi-types";
 import * as JSZip from "jszip";
@@ -6,11 +8,12 @@ import { join } from "path";
 
 import { ArtifactSourceClient, Artifact } from "./interface";
 
-export class GitHubClient implements ArtifactSourceClient {
+export class GitHubClient extends EventEmitter implements ArtifactSourceClient {
   client: Octokit;
   owner: string;
   repo: string;
   constructor(owner: string, repo: string, token: string) {
+    super();
     this.client = new Octokit({ auth: token });
     this.owner = owner;
     this.repo = repo;
@@ -63,6 +66,9 @@ export class GitHubClient implements ArtifactSourceClient {
           .on("finish", () => {
             console.log(`File ${file.name} saved`);
             result.push(outputPath);
+            if (result.length == Object.keys(artArch.files).length) {
+              this.emit("extracted", result);
+            }
           });
       });
       return result;

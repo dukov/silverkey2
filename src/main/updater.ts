@@ -32,6 +32,10 @@ process.parentPort.on("message", async (e) => {
 
 const settings = new SettingsHandler(configFile);
 
+const sendInstall = (path: string) => {
+  process.parentPort.postMessage({ message: "install-update", path: path });
+};
+
 const createUpdateWatcher = (savePath: string): UpdateWatcher => {
   let owner = "";
   let repo = "";
@@ -52,5 +56,6 @@ const createUpdateWatcher = (savePath: string): UpdateWatcher => {
     owner: owner,
     repo: repo,
     token: token,
+    installCallBack: sendInstall,
   });
 };
