@@ -1,4 +1,5 @@
 module.exports = {
+  globals: { VERSION: true },
   root: true,
   parser: "@typescript-eslint/parser",
   parserOptions: {
