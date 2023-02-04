@@ -1,0 +1,25 @@
+
+name: Build/release
+permissions: write-all
+
+on:
+  push:
+    branches:
+      - tst
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: huh
+        run: |
+          echo "tst"
+          echo "huh" > artif.txt
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: test-artif
+          path: artif.txt 
+          retention-days: 1
+

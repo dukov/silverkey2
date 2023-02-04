@@ -11,7 +11,7 @@ import { UpdateWatcher } from "./lib/updater/watcher";
 
 declare const VERSION: string;
 
-const CHECK_INTERVAL = 3600000;
+const CHECK_INTERVAL = 10000;
 
 const ARTEFACT_MAP: { [key: string]: string } = {
   linux: "silverkey2-ubuntu-latest",
@@ -63,6 +63,7 @@ const createUpdateWatcher = (savePath: string): UpdateWatcher => {
     }
   }
 
+  console.log("Current version", VERSION);
   return new UpdateWatcher({
     artifactName: ARTEFACT_MAP[process.platform],
     currentVersion: VERSION,
