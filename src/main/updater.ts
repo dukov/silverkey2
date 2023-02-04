@@ -2,6 +2,8 @@ import { dirname, join } from "path";
 import { SettingsHandler } from "./lib/settings";
 import { UpdateWatcher } from "./lib/updater/watcher";
 
+declare const VERSION: string;
+
 const ARTEFACT_MAP: { [key: string]: string } = {
   linux: "silverkey2-ubuntu-latest",
   darwin: "silverkey2-macos-latest",
@@ -50,7 +52,7 @@ const createUpdateWatcher = (savePath: string): UpdateWatcher => {
 
   return new UpdateWatcher({
     artifactName: ARTEFACT_MAP[process.platform],
-    currentVersion: "",
+    currentVersion: VERSION,
     checkInterval: 10000,
     savePath: savePath,
     owner: owner,

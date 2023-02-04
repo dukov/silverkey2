@@ -1,4 +1,10 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { DefinePlugin } = require("webpack");
+
+const commitHash = require("child_process")
+  .execSync("git rev-parse HEAD")
+  .toString()
+  .trim();
 
 module.exports = [
   {
@@ -25,6 +31,11 @@ module.exports = [
       path: __dirname + "/dist/main",
       filename: "[name].js",
     },
+    plugins: [
+      new DefinePlugin({
+        VERSION: JSON.stringify(commitHash),
+      }),
+    ],
   },
   {
     mode: "development",
