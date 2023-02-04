@@ -4,6 +4,8 @@ import { UpdateWatcher } from "./lib/updater/watcher";
 
 declare const VERSION: string;
 
+const CHECK_INTERVAL = 3600000;
+
 const ARTEFACT_MAP: { [key: string]: string } = {
   linux: "silverkey2-ubuntu-latest",
   darwin: "silverkey2-macos-latest",
@@ -53,7 +55,7 @@ const createUpdateWatcher = (savePath: string): UpdateWatcher => {
   return new UpdateWatcher({
     artifactName: ARTEFACT_MAP[process.platform],
     currentVersion: VERSION,
-    checkInterval: 10000,
+    checkInterval: CHECK_INTERVAL,
     savePath: savePath,
     owner: owner,
     repo: repo,
