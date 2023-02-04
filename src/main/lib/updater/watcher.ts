@@ -72,12 +72,12 @@ export class UpdateWatcher {
       console.log("No artifact found. Sleeping");
       return;
     }
-    if (lastArtifact.version == this.lastDownloadedVersion) {
-      console.log("Artifact already downloaded. Sleeping");
-      return;
-    }
     if (lastArtifact.version == this.currentVersion) {
       console.log("No new artifact. Seeping");
+      return;
+    }
+    if (lastArtifact.version == this.lastDownloadedVersion) {
+      console.log("Artifact already downloaded. Sleeping");
       return;
     }
 
