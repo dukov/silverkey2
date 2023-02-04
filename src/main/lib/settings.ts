@@ -62,8 +62,7 @@ export class SettingsHandler {
   }
   private _load(path: string): Settings {
     const content = fs.readFileSync(path, { encoding: "utf-8" });
-    const settingsRaw = JSON.parse(content);
-    return settingsRaw as Settings;
+    return JSON.parse(content) as Settings;
   }
   save() {
     const content = JSON.stringify(this.settings);

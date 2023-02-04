@@ -1,5 +1,12 @@
 import { dirname, join } from "path";
 import { SettingsHandler } from "./lib/settings";
+import {
+  ConfigFileMessage,
+  CONFIG_MESSAGE,
+  GenericMessage,
+  InstallUpdateMessage,
+  RELOAD_CFG_MESSAGE,
+} from "./lib/updater/interface";
 import { UpdateWatcher } from "./lib/updater/watcher";
 
 declare const VERSION: string;
@@ -14,21 +21,24 @@ const ARTEFACT_MAP: { [key: string]: string } = {
 
 let configFile = "";
 
-process.parentPort.on("message", async (e) => {
-  if (e.data.message == "config-file") {
+process.parentPort.on("message", (e) => {
+  const data = e.data as GenericMessage;
+  if (data.type == "") return;
+  if (data.message == CONFIG_MESSAGE) {
+    const msg = e.data as ConfigFileMessage;
     console.log("Got event with config file");
 
-    configFile = e.data.path;
-    let savePath = join(dirname(configFile), "updates");
+    configFile = msg.path;
+    const savePath = join(dirname(configFile), "updates");
     settings.path = configFile;
     settings.reload();
     console.log("Settings loaded");
 
     if (settings.settings.checkUpdates) {
-      let watcher = createUpdateWatcher(savePath);
+      const watcher = createUpdateWatcher(savePath);
       watcher.run();
     }
-  } else if (e.data.message == "reload-config") {
+  } else if (data.message == RELOAD_CFG_MESSAGE) {
     console.log("Got reload config event");
     settings.reload();
   }
@@ -37,7 +47,8 @@ process.parentPort.on("message", async (e) => {
 const settings = new SettingsHandler(configFile);
 
 const sendInstall = (path: string) => {
-  process.parentPort.postMessage({ message: "install-update", path: path });
+  const msg = new InstallUpdateMessage(path);
+  process.parentPort.postMessage(msg);
 };
 
 const createUpdateWatcher = (savePath: string): UpdateWatcher => {

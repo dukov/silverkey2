@@ -1,10 +1,14 @@
 import { exec } from "child_process";
 
 const installPackageDarwin = (path: string) => {
-  const installer = exec(`open "${path}"`);
+  exec(`open "${path}"`);
 };
-const installPackageWin = (path: string) => {};
-const installPackageLinux = (path: string) => {};
+const installPackageWin = () => {
+  throw new Error("Not implemented");
+};
+const installPackageLinux = () => {
+  throw new Error("Not implemented");
+};
 
 const INSTALLER_MAP: { [key: string]: (path: string) => void } = {
   linux: installPackageLinux,
