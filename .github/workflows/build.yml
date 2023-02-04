@@ -2,9 +2,7 @@ name: Build/release
 permissions: write-all
 
 on:
-  pull_request:
-    types:
-      - closed
+  push:
     branches:
       - main
 
