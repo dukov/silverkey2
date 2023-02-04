@@ -23,7 +23,7 @@ export class UpdateWatcher {
   installCb: (path: string) => void;
   private lastDownloadedVersion?: string;
   private intervalID: NodeJS.Timer | undefined;
-  private lock: boolean = false;
+  private lock = false;
   constructor(config: WatcherConfig) {
     this.artifact = config.artifactName;
     this.currentVersion = config.currentVersion;
@@ -52,18 +52,22 @@ export class UpdateWatcher {
     this.intervalID = setInterval(this.check, this.interval);
   }
 
-  check = async () => {
+  check = () => {
     if (this.lock) {
       console.log("Check/Download in progress. Skipping this iteration");
       return;
     }
-    this.lock = true;
-    await this._check();
-    this.lock = false;
+    void (async () => {
+      this.lock = true;
+      await this._check();
+      this.lock = false;
+    })();
   };
 
   private _check = async () => {
-    let lastArtifact = await this.artifactClient.getLastArtifact(this.artifact);
+    const lastArtifact = await this.artifactClient.getLastArtifact(
+      this.artifact
+    );
     if (lastArtifact == null) {
       console.log("No artifact found. Sleeping");
       return;
@@ -82,19 +86,19 @@ export class UpdateWatcher {
       fs.rmSync(this.savePath, { recursive: true });
     } catch (e) {
       if (e instanceof Error && e.message.indexOf("ENOENT") != -1) {
-        console.log("Artifact download dir does tno exists. Skipping removal");
+        console.log("Artifact download dir does not exists. Skipping removal");
       } else {
         throw e;
       }
     }
     try {
-      const artifactBinaries = await this.artifactClient.downloadArtifact(
+      await this.artifactClient.downloadArtifact(
         lastArtifact.id,
         this.savePath
       );
       this.lastDownloadedVersion = lastArtifact.version;
     } catch (e) {
-      console.log("Failed to download");
+      console.log("Failed to download. Error: ", e);
     }
   };
 }

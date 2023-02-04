@@ -19,6 +19,7 @@ import { join } from "path";
 import { FileDB } from "./lib/localdb/filedb";
 import { Settings, SettingsHandler } from "./lib/settings";
 import { installPackage } from "./lib/updater/installer";
+import { InstallUpdateMessage, INSTALL_MESSAGE } from "./lib/updater/interface";
 
 const assetsDirectory = app.isPackaged
   ? join(process.resourcesPath, "assets")
@@ -101,8 +102,10 @@ const runUpdater = () => {
     console.log("Updater stopped");
   });
   updater.on("message", (e) => {
-    if (e.message == "install-update") {
-      installPackage(e.path);
+    const msg = e as InstallUpdateMessage;
+    if (msg.type == "") return;
+    if (msg.message == INSTALL_MESSAGE) {
+      installPackage(msg.path);
       app.quit();
     }
   });

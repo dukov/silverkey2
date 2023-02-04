@@ -3,6 +3,7 @@ import React, { ChangeEvent } from "react";
 
 import "./Settings.css";
 
+// eslint-disable-next-line
 type T = any;
 
 type SettingsState = {
@@ -24,7 +25,8 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
 
   createSingleSetting(key: string, setting: SingleSetting<T>): JSX.Element {
     if (typeof setting.value == "object") {
-      let subList: JSX.Element[] = [];
+      const subList: JSX.Element[] = [];
+      // eslint-disable-next-line
       for (const [k, v] of Object.entries(setting.value)) {
         subList.push(
           this.createSingleSetting(`${key} ${k}`, v as SingleSetting<T>)
@@ -58,7 +60,7 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
             <input
               type="text"
               data-key={key}
-              value={setting.value}
+              value={setting.value as string}
               onChange={this.onInputChange}
             />
           </div>
@@ -68,13 +70,13 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
   }
 
   renderSettings(): JSX.Element[] {
-    let res: JSX.Element[] = [];
+    const res: JSX.Element[] = [];
     for (const [k, v] of Object.entries(this.state.settings)) {
       res.push(this.createSingleSetting(k, v as SingleSetting<T>));
     }
     return res;
   }
-
+  /* eslint-disable */
   onInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const keypath = (evt.target.dataset["key"] as string).split(" ");
     let origSettings = structuredClone(this.state.settings) as any;
@@ -97,11 +99,14 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
 
     this.setState({ settings: origSettings });
   };
-  onSaveSettings = async () => {
-    await window.eRPC.saveSettings(this.state.settings);
+  /* eslint-enable */
+  onSaveSettings = () => {
+    void (async () => {
+      await window.eRPC.saveSettings(this.state.settings);
+    })();
     location.reload();
   };
-  cancelSaveSettings = async () => {
+  cancelSaveSettings = () => {
     location.reload();
   };
   render(): React.ReactNode {

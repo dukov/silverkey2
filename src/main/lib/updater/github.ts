@@ -1,7 +1,6 @@
 import EventEmitter from "events";
 
 import { Octokit } from "octokit";
-import { components } from "@octokit/openapi-types";
 import * as JSZip from "jszip";
 import * as fs from "fs";
 import { join } from "path";
@@ -43,7 +42,7 @@ export class GitHubClient extends EventEmitter implements ArtifactSourceClient {
   }
 
   async downloadArtifact(artifact_id: number, path: string): Promise<string[]> {
-    let result: string[] = [];
+    const result: string[] = [];
     console.log("Downloading artifact");
     const rawArtifactLink = await this.client.rest.actions.downloadArtifact({
       owner: this.owner,
@@ -57,9 +56,9 @@ export class GitHubClient extends EventEmitter implements ArtifactSourceClient {
     if (rawArtifactLink.data instanceof ArrayBuffer) {
       console.log("Unzipping artifact");
       const artArch = await JSZip.loadAsync(rawArtifactLink.data);
-      artArch.forEach(async (_, file) => {
+      artArch.forEach((_, file) => {
         console.log(`Unzipping ${file.name}`);
-        let outputPath = join(path, file.name);
+        const outputPath = join(path, file.name);
         file
           .nodeStream()
           .pipe(fs.createWriteStream(outputPath))
