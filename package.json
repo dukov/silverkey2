@@ -33,7 +33,7 @@
     "build": "webpack --config ./webpack.config.js",
     "start": "yarn run build && electron .",
     "pack": "electron-builder --dir",
-    "dist": "yarn run build && electron-builder"
+    "dist": "yarn run build && electron-builder -p never"
   },
   "build": {
     "files": [
