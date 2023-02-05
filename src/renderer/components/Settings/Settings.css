@@ -1,10 +1,7 @@
-body {
-  background-color: #f1f1f1;
-}
-
 .settingsMain {
   display: flex;
   flex-direction: column;
+  background-color: #f1f1f1;
 }
 
 .settings-group {

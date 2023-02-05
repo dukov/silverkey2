@@ -115,6 +115,9 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
     settings = this.renderSettings();
     const saveBtn = "\u2714\uFE0F";
     const cancelBtn = "\u274C";
+    window.requestAnimationFrame(() => {
+      window.resizeTo(800, document.body.offsetHeight + 40);
+    });
     return (
       <div className="settingsMain">
         {settings}
