@@ -118,7 +118,9 @@ class Main extends React.Component<{}, MainState> {
         />
       );
     }
-
+    window.requestAnimationFrame(() => {
+      window.resizeTo(800, document.body.offsetHeight + 40);
+    });
     return (
       <div className="main">
         <SearchRow
