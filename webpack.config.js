@@ -1,5 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { DefinePlugin } = require("webpack");
+const { DefinePlugin, IgnorePlugin } = require("webpack");
 
 const commitHash = require("child_process")
   .execSync("git rev-parse HEAD")
@@ -34,6 +34,10 @@ module.exports = [
     plugins: [
       new DefinePlugin({
         VERSION: JSON.stringify(commitHash),
+      }),
+      new IgnorePlugin({
+        resourceRegExp: /canvas/,
+        contextRegExp: /jsdom$/,
       }),
     ],
   },
