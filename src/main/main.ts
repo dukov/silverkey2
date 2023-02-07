@@ -149,7 +149,7 @@ app.on("window-all-closed", () => {
 
 const userData = app.getPath("userData");
 console.log("User data dir", userData);
-const db = new FileDB(join(userData, "kvdb.json"));
+const db = new FileDB(join(userData));
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
 console.log("Settings loaded");
 if (settings.settings.checkUpdates) {
