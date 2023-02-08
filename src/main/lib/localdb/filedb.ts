@@ -12,17 +12,16 @@ class FileWatcher {
     this.path = path;
   }
 
-  startWatch() {
+  startWatch(onChange: (curr: fs.Stats, prev: fs.Stats) => void) {
     console.log(`Watching for file changes on ${this.path}`);
-    fs.watchFile(this.path, () => {
-      console.log(`${this.path} file Changed`);
-    });
+    fs.watchFile(this.path, onChange);
   }
 }
 
 export class FileDB {
   contents: { [x: string]: string };
   path: string;
+  private dbWatcher: FileWatcher;
   constructor(path: string) {
     if (!fs.lstatSync(path).isDirectory()) {
       throw new Error(
@@ -49,6 +48,13 @@ export class FileDB {
           }
         }
       }
+    });
+
+    this.dbWatcher = new FileWatcher(this.path);
+    this.dbWatcher.startWatch(() => {
+      console.log("DB updated. Re-reading");
+      const data = fs.readFileSync(this.path);
+      this.contents = new MindMap(data.toString("utf-8")).toDict();
     });
   }
 
