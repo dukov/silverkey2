@@ -1,5 +1,5 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { DefinePlugin, IgnorePlugin } = require("webpack");
+const { DefinePlugin, IgnorePlugin, EnvironmentPlugin } = require("webpack");
 
 const commitHash = require("child_process")
   .execSync("git rev-parse HEAD")
@@ -8,7 +8,7 @@ const commitHash = require("child_process")
 
 module.exports = [
   {
-    mode: "development",
+    mode: process.env.NODE_ENV ? process.env.NODE_ENV : "development",
     entry: {
       main: "./src/main/main.ts",
       preload: "./src/main/preload.ts",
@@ -34,6 +34,7 @@ module.exports = [
     plugins: [
       new DefinePlugin({
         VERSION: JSON.stringify(commitHash),
+        IS_PROD: process.env.NODE_ENV == "production",
       }),
       new IgnorePlugin({
         resourceRegExp: /canvas/,

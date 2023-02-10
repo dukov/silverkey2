@@ -21,6 +21,8 @@ import { Settings, SettingsHandler } from "./lib/settings";
 import { installPackage } from "./lib/updater/installer";
 import { InstallUpdateMessage, INSTALL_MESSAGE } from "./lib/updater/interface";
 
+declare const IS_PROD: boolean;
+
 const assetsDirectory = app.isPackaged
   ? join(process.resourcesPath, "assets")
   : join(__dirname, "../../assets");
@@ -38,7 +40,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    transparent: app.isPackaged,
+    transparent: IS_PROD,
     skipTaskbar: true,
     webPreferences: {
       preload: join(__dirname, "preload.js"),
@@ -49,7 +51,7 @@ const createWindow = () => {
   void mainWindow.loadFile(join(rendererDir, "index.html"));
 
   // Open the DevTools.
-  if (process.env.DEBUG == "true" || !app.isPackaged)
+  if (!IS_PROD || process.env.DEBUG == "true")
     mainWindow.webContents.openDevTools();
   return mainWindow;
 };
@@ -92,7 +94,7 @@ const createTray = async () => {
 };
 
 const runUpdater = () => {
-  if (updater != null) return;
+  if (updater != null || IS_PROD) return;
   updater = utilityProcess.fork(join(__dirname, "updater.js"));
   updater.on("spawn", () => {
     console.log("Updater started");
@@ -190,11 +192,16 @@ ipcMain.handle("save-settings", (_, newSettings: Settings) => {
   settings.settings = newSettings;
   settings.save();
   console.log("Settings saved");
+
   if (settings.settings.checkUpdates) {
     if (updater == null) {
       runUpdater();
     } else {
       updater.postMessage({ message: "reload-config" });
+    }
+  } else {
+    if (updater) {
+      updater.kill();
     }
   }
 });
