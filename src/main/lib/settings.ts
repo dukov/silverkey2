@@ -9,17 +9,40 @@ export interface SingleSetting<T> {
   description: string;
 }
 
+class SingleSettingImpl<T> {
+  _value: T;
+  _description: string;
+  constructor(val: T, desc: string) {
+    this._value = val;
+    this._description = desc;
+  }
+}
+
 interface UpdateSourceConfig {
   updateSource: SingleSetting<UpdateSource>;
   user: SingleSetting<string>;
   repo: SingleSetting<string>;
-  password?: SingleSetting<string>;
+  password: SingleSetting<string>;
 }
+
+const isDict = (v: any) => {
+  return v && typeof v == "object" && !Array.isArray(v);
+};
+
+const deepMerge = (target: any, source: any) => {
+  for (const k in source) {
+    if ((target[k] && !isDict(target[k])) || !target[k] || !isDict(source[k])) {
+      target[k] = source[k];
+    } else {
+      deepMerge(target[k], source[k]);
+    }
+  }
+};
 
 export interface Settings {
   freePlanePath: SingleSetting<string>;
   checkUpdates: SingleSetting<boolean>;
-  updateSourceConfig?: SingleSetting<UpdateSourceConfig>;
+  updateSourceConfig: SingleSetting<UpdateSourceConfig>;
 }
 
 const DEFAULT_SETTINGS: Settings = {
@@ -59,11 +82,14 @@ export class SettingsHandler {
   path: string;
   constructor(path: string) {
     this.path = path;
+    this.settings = DEFAULT_SETTINGS;
+    let fromFile = {};
     try {
-      this.settings = this._load(this.path);
+      fromFile = this._load(this.path);
     } catch (err) {
-      this.settings = DEFAULT_SETTINGS;
+      console.log("Did not load settings from file. Use default");
     }
+    deepMerge(this.settings, fromFile);
   }
   private _load(path: string): Settings {
     const content = fs.readFileSync(path, { encoding: "utf-8" });
