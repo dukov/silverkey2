@@ -17,11 +17,16 @@ interface UpdateSourceConfig {
 }
 
 export interface Settings {
+  freePlanePath: SingleSetting<string>;
   checkUpdates: SingleSetting<boolean>;
   updateSourceConfig?: SingleSetting<UpdateSourceConfig>;
 }
 
 const DEFAULT_SETTINGS: Settings = {
+  freePlanePath: {
+    value: "",
+    description: "Path to Freeplane binary",
+  },
   checkUpdates: {
     value: false,
     description: "Enable automatic updates",
