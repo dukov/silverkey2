@@ -16,6 +16,7 @@ import {
 
 import { join } from "path";
 
+import { FreePlaneRunner } from "./lib/freeplane";
 import { FileDB } from "./lib/localdb/filedb";
 import { Settings, SettingsHandler } from "./lib/settings";
 import { installPackage } from "./lib/updater/installer";
@@ -204,4 +205,12 @@ ipcMain.handle("save-settings", (_, newSettings: Settings) => {
       updater.kill();
     }
   }
+});
+
+ipcMain.handle("run-freeplane", (_, path: string) => {
+  const fp = new FreePlaneRunner();
+  if (!fp.path) {
+    fp.path = path;
+  }
+  fp.run();
 });
