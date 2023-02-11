@@ -4,6 +4,7 @@ import "./SearchRow.css";
 
 import SearchInput, { SearchInputProps } from "../SearchInput/SearchInput";
 import AddKeyBtn from "../AddKeyBtn/AddKeyBtn";
+import RunFreeplaneBtn from "../RunFreeplaneBtn/RunFreeplaneBtn";
 import { AddKeyBtnState } from "../Common/Types";
 
 type SearchRowExt = {
@@ -33,6 +34,7 @@ class SearchRow extends React.Component<SearchRowProp> {
           showAddKey={this.props.showAddKey}
           saveKey={this.props.saveKey}
         />
+        <RunFreeplaneBtn />
       </div>
     );
   }
