@@ -13,12 +13,12 @@ const electronRPC = {
   isSettings: (cb: (e: Electron.IpcRendererEvent, s: Settings) => void) =>
     ipcRenderer.on("show-settings", cb),
   getSettings: (): Promise<Settings> => {
-    console.log("Requesting settings");
     return ipcRenderer.invoke("get-settings") as Promise<Settings>;
   },
   saveSettings: (settings: Settings) =>
     ipcRenderer.invoke("save-settings", settings),
   runFreePlane: (path: string) => ipcRenderer.invoke("run-freeplane", path),
+  getFpPath: (): Promise<string> => ipcRenderer.invoke("get-fp-path"),
 };
 
 contextBridge.exposeInMainWorld("eRPC", electronRPC);

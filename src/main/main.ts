@@ -159,6 +159,13 @@ if (settings.settings.checkUpdates) {
   runUpdater();
 }
 
+let freeplane: FreePlaneRunner = new FreePlaneRunner(db.path, () => {
+  if (!mainWindow) createWindow();
+});
+if (freeplane.path == null && settings.settings.freePlanePath.value != "") {
+  freeplane.path = settings.settings.freePlanePath.value;
+}
+
 ipcMain.handle("get-keys", () => {
   return db.getKeys();
 });
@@ -207,10 +214,11 @@ ipcMain.handle("save-settings", (_, newSettings: Settings) => {
   }
 });
 
+ipcMain.handle("get-fp-path", () => {
+  return freeplane.path;
+});
+
 ipcMain.handle("run-freeplane", (_, path: string) => {
-  const fp = new FreePlaneRunner();
-  if (!fp.path) {
-    fp.path = path;
-  }
-  fp.run();
+  freeplane.path = path;
+  freeplane.run();
 });
