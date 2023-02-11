@@ -5,9 +5,13 @@ const MAC_FREEPLANE_DEFAULT_PATH =
   "/Applications/Freeplane.app/Contents/MacOS/Freeplane";
 
 export class FreePlaneRunner {
+  mmPath: string;
   path: string | null;
   freplane: ChildProcess | null = null;
-  constructor() {
+  onStop: () => void;
+  constructor(mmPath: string, onStop: () => void) {
+    this.mmPath = mmPath;
+    this.onStop = onStop;
     this.path = this.findFreePlaneBinary();
   }
   private findFreePlaneBinary(): string | null {
@@ -29,13 +33,14 @@ export class FreePlaneRunner {
     return MAC_FREEPLANE_DEFAULT_PATH;
   }
   private spawnFreeplaneProcess(path: string) {
-    const fp = execFile(path);
+    const fp = execFile(path, [this.mmPath]);
     fp.on("spawn", () => {
       console.log("Freeplane Process started");
       this.freplane = fp;
     });
     fp.on("exit", () => {
       console.log("Freeplane Process stopped");
+      this.onStop();
       this.freplane = null;
     });
   }

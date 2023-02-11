@@ -2,48 +2,31 @@ import React, { ChangeEvent } from "react";
 
 import "./RunFreeplaneBtn.css";
 
-type FreeplaneBtnState = {
-  freeplanePath: string;
-};
-
-class RunFreeplaneBtn extends React.Component<{}, FreeplaneBtnState> {
-  state = {
-    freeplanePath: "",
-  };
-
+class RunFreeplaneBtn extends React.Component {
   inputFile = React.createRef<HTMLInputElement>();
-  async componentDidMount() {
-    if (this.state.freeplanePath == "") {
-      const settings = await window.eRPC.getSettings();
-      if (settings.freePlanePath) {
-        this.setState({ freeplanePath: settings.freePlanePath.value });
-      }
-    }
+
+  async runFreeplane(path: string) {
+    await window.eRPC.runFreePlane(path);
+    window.close();
   }
   onClick = () => {
-    if (this.state.freeplanePath == "" && this.inputFile.current) {
-      this.inputFile.current.click();
-    }
     (async () => {
-      await window.eRPC.runFreePlane(this.state.freeplanePath);
+      let path = await window.eRPC.getFpPath();
+      if (!path) {
+        if (this.inputFile.current) this.inputFile.current.click();
+      } else {
+        this.runFreeplane(path);
+      }
     })();
   };
   onFilePathChange = (evt: ChangeEvent<HTMLInputElement>) => {
     if (evt.target.files && evt.target.files.length > 0) {
       const path = evt.target.files[0].path;
-      this.setState({ freeplanePath: path });
       (async () => {
-        console.log("Saving");
         const settings = await window.eRPC.getSettings();
-        if (!settings.freePlanePath) {
-          settings.freePlanePath = {
-            value: "",
-            description: "Path to Freeplane binary",
-          };
-        }
         settings.freePlanePath.value = path;
-        console.log("Settings", settings);
         await window.eRPC.saveSettings(settings);
+        this.runFreeplane(path);
       })();
     }
   };
