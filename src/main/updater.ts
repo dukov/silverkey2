@@ -52,16 +52,9 @@ const sendInstall = (path: string) => {
 };
 
 const createUpdateWatcher = (savePath: string): UpdateWatcher => {
-  let owner = "";
-  let repo = "";
-  let token = "";
-  if (settings.settings.updateSourceConfig != null) {
-    owner = settings.settings.updateSourceConfig.value.user.value;
-    repo = settings.settings.updateSourceConfig.value.repo.value;
-    if (settings.settings.updateSourceConfig.value.password != null) {
-      token = settings.settings.updateSourceConfig.value.password.value;
-    }
-  }
+  const owner = settings.settings.updateSourceConfig.value.user.value;
+  const repo = settings.settings.updateSourceConfig.value.repo.value;
+  const token = settings.settings.updateSourceConfig.value.password.value;
 
   return new UpdateWatcher({
     artifactName: ARTEFACT_MAP[process.platform],
