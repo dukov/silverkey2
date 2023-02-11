@@ -4,7 +4,7 @@ import { execFile, ChildProcess } from "child_process";
 const MAC_FREEPLANE_DEFAULT_PATH =
   "/Applications/Freeplane.app/Contents/MacOS/Freeplane";
 
-class FreePlaneRunner {
+export class FreePlaneRunner {
   path: string | null;
   freplane: ChildProcess | null = null;
   constructor() {

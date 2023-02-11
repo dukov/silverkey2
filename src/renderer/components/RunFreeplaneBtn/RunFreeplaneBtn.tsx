@@ -24,19 +24,27 @@ class RunFreeplaneBtn extends React.Component<{}, FreeplaneBtnState> {
     if (this.state.freeplanePath == "" && this.inputFile.current) {
       this.inputFile.current.click();
     }
+    (async () => {
+      await window.eRPC.runFreePlane(this.state.freeplanePath);
+    })();
   };
   onFilePathChange = (evt: ChangeEvent<HTMLInputElement>) => {
-    console.log(evt.target.files);
     if (evt.target.files && evt.target.files.length > 0) {
       const path = evt.target.files[0].path;
       this.setState({ freeplanePath: path });
-      /* (async () => {
+      (async () => {
         console.log("Saving");
         const settings = await window.eRPC.getSettings();
+        if (!settings.freePlanePath) {
+          settings.freePlanePath = {
+            value: "",
+            description: "Path to Freeplane binary",
+          };
+        }
         settings.freePlanePath.value = path;
         console.log("Settings", settings);
         await window.eRPC.saveSettings(settings);
-      })();*/
+      })();
     }
   };
   render(): React.ReactNode {

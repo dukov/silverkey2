@@ -18,6 +18,7 @@ const electronRPC = {
   },
   saveSettings: (settings: Settings) =>
     ipcRenderer.invoke("save-settings", settings),
+  runFreePlane: (path: string) => ipcRenderer.invoke("run-freeplane", path),
 };
 
 contextBridge.exposeInMainWorld("eRPC", electronRPC);
