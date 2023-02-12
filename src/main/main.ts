@@ -41,7 +41,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    transparent: IS_PROD,
+    transparent: true,
     skipTaskbar: true,
     webPreferences: {
       preload: join(__dirname, "preload.js"),
@@ -51,9 +51,30 @@ const createWindow = () => {
   // and load the index.html of the app.
   void mainWindow.loadFile(join(rendererDir, "index.html"));
 
+  /*
+  IS_PROD isPackaged DEBUG showDT
+    0       0         0     1
+    0       0         1     1
+    0       1         1     1
+    1       0         1     1
+    1       1         1     1
+
+    0       1         0     0
+    1       0         0     0
+    1       1         0     0
+  */
+  let showDT = true;
+  // TODO Simplify logic expression
+  if (
+    (!IS_PROD && app.isPackaged && process.env.DEBUG != "true") ||
+    (IS_PROD && !app.isPackaged && process.env.DEBUG != "true") ||
+    (IS_PROD && app.isPackaged && process.env.DEBUG != "true")
+  ) {
+    showDT = false;
+  }
+
   // Open the DevTools.
-  if (!IS_PROD || process.env.DEBUG == "true")
-    mainWindow.webContents.openDevTools();
+  if (showDT) mainWindow.webContents.openDevTools();
   return mainWindow;
 };
 
