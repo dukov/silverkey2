@@ -13,3 +13,23 @@
   margin-top: 2px;
   margin-bottom: 2px;
 }
+
+.fp-btn-jumping {
+  background: url("https://raw.githubusercontent.com/freeplane/freeplane/3e6a1230ca958fab95cb83264fd638479f278426/freeplane_framework/launch4j/Freeplane_app.ico");
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 50px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  animation: jump .5s linear alternate infinite;
+}
+
+.fp-btn:hover {
+  margin-top: 1px;
+  margin-bottom: 3px;
+}
+
+@keyframes jump {
+  0%   {transform: translateY(-10px)}
+  100% {transform: translateY(0px)}
+}
