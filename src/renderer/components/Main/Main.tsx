@@ -9,6 +9,7 @@ import ValueInput from "../ValueInput/ValueInput";
 
 type MainState = {
   searchVal: string;
+  searchFocus: boolean;
   filteredKeys: string[];
   selectedID: number | null;
   addOrSave: AddKeyBtnState;
@@ -18,6 +19,7 @@ type MainState = {
 class Main extends React.Component<{}, MainState> {
   state = {
     searchVal: "",
+    searchFocus: false,
     filteredKeys: [],
     allKeys: [],
     selectedID: 0,
@@ -45,7 +47,13 @@ class Main extends React.Component<{}, MainState> {
   filterKeys = (flt: string) => {
     if (this.state.addOrSave == AddKeyBtnState.Add) {
       const filtered = this._filterKeys(flt);
-      this.setState({ filteredKeys: filtered, searchVal: flt });
+      this.setState({
+        filteredKeys: filtered,
+        searchVal: flt,
+        searchFocus: false,
+      });
+    } else {
+      this.setState({ searchVal: flt, searchFocus: false });
     }
   };
 
@@ -80,6 +88,7 @@ class Main extends React.Component<{}, MainState> {
       addOrSave: AddKeyBtnState.Add,
       valueToAdd: "",
       filteredKeys: filtered,
+      searchFocus: true,
     });
   };
 
@@ -125,6 +134,7 @@ class Main extends React.Component<{}, MainState> {
       <div className="main">
         <SearchRow
           searchVal={this.state.searchVal}
+          searchFocus={this.state.searchFocus}
           selectedKey={
             // Selected key is empty if selected id null
             this.state.selectedID != null
