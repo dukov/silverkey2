@@ -159,7 +159,7 @@ if (settings.settings.checkUpdates) {
   runUpdater();
 }
 
-let freeplane: FreePlaneRunner = new FreePlaneRunner(db.path, () => {
+const freeplane: FreePlaneRunner = new FreePlaneRunner(db.path, () => {
   if (!mainWindow) createWindow();
 });
 if (freeplane.path == null && settings.settings.freePlanePath.value != "") {

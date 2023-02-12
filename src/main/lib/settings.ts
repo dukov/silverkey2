@@ -9,15 +9,6 @@ export interface SingleSetting<T> {
   description: string;
 }
 
-class SingleSettingImpl<T> {
-  _value: T;
-  _description: string;
-  constructor(val: T, desc: string) {
-    this._value = val;
-    this._description = desc;
-  }
-}
-
 interface UpdateSourceConfig {
   updateSource: SingleSetting<UpdateSource>;
   user: SingleSetting<string>;
@@ -25,6 +16,7 @@ interface UpdateSourceConfig {
   password: SingleSetting<string>;
 }
 
+/* eslint-disable */
 const isDict = (v: any) => {
   return v && typeof v == "object" && !Array.isArray(v);
 };
@@ -38,6 +30,7 @@ const deepMerge = (target: any, source: any) => {
     }
   }
 };
+/* eslint-enable */
 
 export interface Settings {
   freePlanePath: SingleSetting<string>;
