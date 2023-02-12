@@ -2,12 +2,22 @@ import React, { ChangeEvent } from "react";
 
 import "./RunFreeplaneBtn.css";
 
-class RunFreeplaneBtn extends React.Component {
+type FreeplaneBtnState = {
+  fpBtnClass: string;
+};
+
+class RunFreeplaneBtn extends React.Component<{}, FreeplaneBtnState> {
   inputFile = React.createRef<HTMLInputElement>();
 
+  state = {
+    fpBtnClass: "fp-btn",
+  };
   async runFreeplane(path: string) {
     await window.eRPC.runFreePlane(path);
-    window.close();
+    this.setState({ fpBtnClass: "fp-btn-jumping" });
+    setTimeout(() => {
+      window.close();
+    }, 10000);
   }
   onClick = () => {
     (async () => {
@@ -40,7 +50,7 @@ class RunFreeplaneBtn extends React.Component {
           ref={this.inputFile}
           onChange={this.onFilePathChange}
         />
-        <a href="#" className="fp-btn" onClick={this.onClick} />
+        <a href="#" className={this.state.fpBtnClass} onClick={this.onClick} />
       </div>
     );
   }
