@@ -18,7 +18,8 @@ const electronRPC = {
   saveSettings: (settings: Settings) =>
     ipcRenderer.invoke("save-settings", settings),
   runFreePlane: (path: string) => ipcRenderer.invoke("run-freeplane", path),
-  getFpPath: (): Promise<string> => ipcRenderer.invoke("get-fp-path"),
+  getFpPath: (): Promise<string> =>
+    ipcRenderer.invoke("get-fp-path") as Promise<string>,
 };
 
 contextBridge.exposeInMainWorld("eRPC", electronRPC);
