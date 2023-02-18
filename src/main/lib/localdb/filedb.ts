@@ -53,8 +53,12 @@ export class FileDB {
     this.dbWatcher = new FileWatcher(this.path);
     this.dbWatcher.startWatch(() => {
       console.log("DB updated. Re-reading");
-      const data = fs.readFileSync(this.path);
-      this.contents = new MindMap(data.toString("utf-8")).toDict();
+      try {
+        const data = fs.readFileSync(this.path);
+        this.contents = new MindMap(data.toString("utf-8")).toDict();
+      } catch (e) {
+        console.log("File re-read failed.");
+      }
     });
   }
 
