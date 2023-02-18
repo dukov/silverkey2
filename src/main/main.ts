@@ -41,6 +41,7 @@ const createWindow = () => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    frame: false,
     transparent: true,
     skipTaskbar: true,
     webPreferences: {
