@@ -30,6 +30,18 @@ const deepMerge = (target: any, source: any) => {
     }
   }
 };
+
+const deepUpdate = (target: any, source: any) => {
+  for (const k in target) {
+    if (typeof target[k] == typeof source[k]) {
+      if (isDict(target[k])) {
+        deepUpdate(target[k], source[k]);
+      } else {
+        target[k] = source[k];
+      }
+    }
+  }
+};
 /* eslint-enable */
 
 export interface Settings {
@@ -82,7 +94,7 @@ export class SettingsHandler {
     } catch (err) {
       console.log("Did not load settings from file. Use default");
     }
-    deepMerge(this.settings, fromFile);
+    deepUpdate(this.settings, fromFile);
   }
   private _load(path: string): Settings {
     const content = fs.readFileSync(path, { encoding: "utf-8" });
