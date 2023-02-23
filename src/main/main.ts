@@ -176,16 +176,26 @@ const userData = app.getPath("userData");
 console.log("User data dir", userData);
 const db = new FileDB(join(userData));
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
+settings.settings.on("cfg.checkUpdates", (val: boolean) => {
+  if (val) {
+    runUpdater();
+  } else {
+    if (updater) updater.kill();
+  }
+});
 console.log("Settings loaded");
-if (settings.settings.checkUpdates) {
+if (settings.settings.getChild("checkUpdates").value) {
   runUpdater();
 }
 
 const freeplane: FreePlaneRunner = new FreePlaneRunner(db.path, () => {
   if (!mainWindow) createWindow();
 });
-if (freeplane.path == null && settings.settings.freePlanePath.value != "") {
-  freeplane.path = settings.settings.freePlanePath.value;
+if (
+  freeplane.path == null &&
+  settings.settings.getChild("freePlanePath").value != ""
+) {
+  freeplane.path = settings.settings.getChild("freePlanePath").value;
 }
 
 ipcMain.handle("get-keys", () => {
