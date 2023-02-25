@@ -1,10 +1,10 @@
+import { app } from "electron";
 import { dirname, join } from "path";
-import { SettingsHandler } from "./lib/settings";
+import { Setting, SettingsHandler } from "./lib/settings";
 import {
-  ConfigFileMessage,
   CONFIG_MESSAGE,
-  GenericMessage,
-  InstallUpdateMessage,
+  INSTALL_MESSAGE,
+  Message,
   RELOAD_CFG_MESSAGE,
 } from "./lib/updater/interface";
 import { UpdateWatcher } from "./lib/updater/watcher";
@@ -21,49 +21,48 @@ const ARTEFACT_MAP: { [key: string]: string } = {
 
 let configFile = "";
 
-process.parentPort.on("message", (e) => {
-  const data = e.data as GenericMessage;
-  if (data.type == "") return;
-  if (data.message == CONFIG_MESSAGE) {
-    const msg = e.data as ConfigFileMessage;
-    console.log("Got event with config file");
-
-    configFile = msg.path;
-    const savePath = join(dirname(configFile), "updates");
-    settings.path = configFile;
-    settings.reload();
-    console.log("Settings loaded");
-
-    if (settings.settings.checkUpdates) {
-      const watcher = createUpdateWatcher(savePath);
-      watcher.run();
-    }
-  } else if (data.message == RELOAD_CFG_MESSAGE) {
-    console.log("Got reload config event");
-    settings.reload();
+class UpdaterProc {
+  private watcher: UpdateWatcher | null = null;
+  constructor() {
+    process.parentPort.on("message", (msgEvt) => {
+      this.processMsg(msgEvt.data as Message);
+    });
   }
-});
+  private processMsg(msg: Message) {
+    if (msg.type == CONFIG_MESSAGE) {
+      if (this.watcher != null) this.watcher.stop();
 
-const settings = new SettingsHandler(configFile);
+      const userData = app.getPath("userData");
+      this.watcher = createUpdateWatcher(
+        msg.args[0],
+        join(userData, "updates")
+      );
+      this.watcher.run();
+    }
+  }
+}
 
 const sendInstall = (path: string) => {
-  const msg = new InstallUpdateMessage(path);
+  const msg: Message = { type: INSTALL_MESSAGE, args: [] };
   process.parentPort.postMessage(msg);
 };
 
-const createUpdateWatcher = (savePath: string): UpdateWatcher => {
-  const owner = settings.settings.updateSourceConfig.value.user.value;
-  const repo = settings.settings.updateSourceConfig.value.repo.value;
-  const token = settings.settings.updateSourceConfig.value.password.value;
+const createUpdateWatcher = (
+  settings: Setting,
+  savePath: string
+): UpdateWatcher => {
+  const owner = settings.getChild("user").value;
+  const repo = settings.getChild("repo").value;
+  const token = settings.getChild("password").value;
 
   return new UpdateWatcher({
     artifactName: ARTEFACT_MAP[process.platform],
     currentVersion: VERSION,
     checkInterval: CHECK_INTERVAL,
     savePath: savePath,
-    owner: owner,
-    repo: repo,
-    token: token,
+    owner: owner as string,
+    repo: repo as string,
+    token: token as string,
     installCallBack: sendInstall,
   });
 };
