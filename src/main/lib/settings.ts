@@ -1,14 +1,17 @@
 import * as fs from "fs";
 import { EventEmitter } from "events";
 
+export const UPDATE_SRC_CONFIG_EVT = "cfg.updateSourceConfig";
+export const CHECK_UPDATES_EVT = "cfg.checkUpdates";
+
 enum UpdateSource {
   github = "github",
 }
 
 /* eslint-disable */
-const deepLoad = (setting: ISetting, cfg: any) => {
+const deepLoad = (setting: Setting, cfg: any) => {
   if (cfg == undefined) return;
-  if (setting.value && cfg[setting.name]) {
+  if (setting.value != undefined && cfg[setting.name] != undefined) {
     setting.value = cfg[setting.name];
   } else {
     for (const name of setting.getChildrenNames()) {
@@ -16,7 +19,7 @@ const deepLoad = (setting: ISetting, cfg: any) => {
     }
   }
 };
-const deepDump = (setting: ISetting, cfg: any) => {
+const deepDump = (setting: Setting, cfg: any) => {
   if (setting.getChildrenNames().length == 0) {
     cfg[setting.name] = setting.value;
   } else {
@@ -26,30 +29,21 @@ const deepDump = (setting: ISetting, cfg: any) => {
     }
   }
 };
+
 /* eslint-enable */
 
 type SettingValueType = string | boolean | number | undefined;
-
-interface ISetting extends EventEmitter {
-  name: string;
-  visible: boolean;
-  eventName?: string;
-  value: SettingValueType;
-  getChildrenNames(): string[];
-  getChild(name: string, def?: ISetting): ISetting;
-  addChild(ch: ISetting): void;
-}
 
 type SettingParams = {
   visible: boolean;
   eventName?: string;
 };
 
-class Setting extends EventEmitter implements ISetting {
+export class Setting extends EventEmitter {
   name: string;
   visible: boolean;
   eventName?: string;
-  private _children: { [key: string]: ISetting } = {};
+  private _children: { [key: string]: Setting } = {};
   private _val: SettingValueType;
   constructor(name: string, value: SettingValueType, params?: SettingParams) {
     super();
@@ -68,7 +62,7 @@ class Setting extends EventEmitter implements ISetting {
     if (this.eventName) this.emit(this.eventName, newVal);
   }
 
-  addChild(ch: ISetting) {
+  addChild(ch: Setting) {
     if (ch.eventName && ch.eventName != "") {
       ch.on(ch.eventName, (...args) => {
         // eslint-disable-next-line
@@ -77,7 +71,7 @@ class Setting extends EventEmitter implements ISetting {
     }
     this._children[ch.name] = ch;
   }
-  getChild(name: string, def?: ISetting): ISetting {
+  getChild(name: string, def?: Setting): Setting {
     if (this._children[name]) return this._children[name];
     if (def) return def;
     throw new Error(`Option key ${name} does not exists for setting`);
@@ -85,20 +79,54 @@ class Setting extends EventEmitter implements ISetting {
   getChildrenNames(): string[] {
     return Object.keys(this._children);
   }
+
+  update(newSetting: Setting) {
+    if (this.value != undefined && newSetting.value != undefined) {
+      this.value = newSetting.value;
+    } else if (this._val == undefined && newSetting.value == undefined) {
+      for (const childName in this._children) {
+        this._children[childName].update(newSetting.getChild(childName));
+      }
+    } else {
+      throw new Error(
+        `Failed to update setting ${this.name}. New setting has different type`
+      );
+    }
+  }
 }
 
-const getConfig = (): Setting => {
+export const getDefaultSettings = (): Setting => {
   const updateCfg = new Setting("updateSourceConfig", false);
-  updateCfg.addChild(new Setting("updateSource", UpdateSource.github));
-  updateCfg.addChild(new Setting("user", "dukov"));
-  updateCfg.addChild(new Setting("repo", "silverkey2"));
-  updateCfg.addChild(new Setting("password", ""));
+  updateCfg.addChild(
+    new Setting("updateSource", UpdateSource.github, {
+      visible: true,
+      eventName: UPDATE_SRC_CONFIG_EVT,
+    })
+  );
+  updateCfg.addChild(
+    new Setting("user", "dukov", {
+      visible: true,
+      eventName: UPDATE_SRC_CONFIG_EVT,
+    })
+  );
+  updateCfg.addChild(
+    new Setting("repo", "silverkey2", {
+      visible: true,
+      eventName: UPDATE_SRC_CONFIG_EVT,
+    })
+  );
+  updateCfg.addChild(
+    new Setting("password", "", {
+      visible: true,
+      eventName: UPDATE_SRC_CONFIG_EVT,
+    })
+  );
 
   const checkUpdates = new Setting("checkUpdates", false, {
     visible: true,
-    eventName: "cfg.checkUpdates",
+    eventName: CHECK_UPDATES_EVT,
   });
-  checkUpdates.on("cfg.checkUpdates", (val: boolean) => {
+  checkUpdates.on(CHECK_UPDATES_EVT, (val: boolean) => {
     updateCfg.visible = val;
   });
 
@@ -110,15 +138,23 @@ const getConfig = (): Setting => {
 };
 
 export class SettingsHandler {
-  settings: Setting;
+  _settings: Setting;
   path: string;
   constructor(path: string) {
     this.path = path;
-    this.settings = getConfig();
+    this._settings = this._load(this.path);
+  }
+
+  get settings(): Setting {
+    return this._settings;
+  }
+
+  set settings(newSettings: Setting) {
+    this._settings.update(newSettings);
   }
 
   private _load(path: string): Setting {
-    const defaults = getConfig();
+    const defaults = getDefaultSettings();
     let cfg = {};
     try {
       const content = fs.readFileSync(path, { encoding: "utf-8" });
