@@ -26,11 +26,13 @@ export class Updater {
     if (this._proc == null) return;
 
     this._proc.on("spawn", () => {
+      const cfg = this._settings.getChild("updateSourceConfig").toData();
       const msg: Message = {
         type: CONFIG_MESSAGE,
-        args: [this._settings.getChild("updateSourceConfig")],
+        args: [cfg, app.getPath("userData")],
       };
-      this._proc?.postMessage(msg);
+      console.log("Proc", this._proc?.pid);
+      if (this._proc) this._proc.postMessage(msg);
       console.log("Updater started");
     });
 
