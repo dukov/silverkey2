@@ -11,8 +11,8 @@ enum UpdateSource {
 /* eslint-disable */
 const deepLoad = (setting: Setting, cfg: any) => {
   if (cfg == undefined) return;
-  if (setting.value != undefined && cfg[setting.name] != undefined) {
-    setting.value = cfg[setting.name];
+  if (setting.value != undefined && cfg != undefined) {
+    setting.value = cfg;
   } else {
     for (const name of setting.getChildrenNames()) {
       if (cfg[name]) deepLoad(setting.getChild(name), cfg[name]);
@@ -208,14 +208,14 @@ export class SettingsHandler {
 
   private _load(path: string): Setting {
     const defaults = getDefaultSettings();
-    let cfg = {};
+    let cfg: { [k: string]: any } = {};
     try {
       const content = fs.readFileSync(path, { encoding: "utf-8" });
       cfg = JSON.parse(content) as typeof cfg;
     } catch (err) {
       console.log("Did not load settings from file. Use default");
     }
-    deepLoad(defaults, cfg);
+    deepLoad(defaults, cfg[defaults.name]);
     return defaults;
   }
 

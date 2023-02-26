@@ -75,11 +75,9 @@ class SettingsMain extends React.Component<{}, SettingsState> {
   onInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const keypath = (evt.target.dataset["key"] as string).split(" ");
     keypath.shift();
-    console.log("Key path", keypath);
     let origSettings = structuredClone(this.state.settings);
     let settings = origSettings;
     for (const key of keypath) {
-      console.log("Dump set", settings, key);
       if (settings == undefined || settings.value != undefined) {
         console.error(
           `Error finding setting by path ${keypath}. Setting ${settings.name} has defined value`

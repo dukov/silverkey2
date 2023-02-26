@@ -1,11 +1,10 @@
 import { app } from "electron";
-import { dirname, join } from "path";
-import { Setting, SettingsHandler } from "./lib/settings";
+import { join } from "path";
+import { Setting, SettingData } from "./lib/settings";
 import {
   CONFIG_MESSAGE,
   INSTALL_MESSAGE,
   Message,
-  RELOAD_CFG_MESSAGE,
 } from "./lib/updater/interface";
 import { UpdateWatcher } from "./lib/updater/watcher";
 
@@ -19,8 +18,6 @@ const ARTEFACT_MAP: { [key: string]: string } = {
   win32: "silverkey2-windows-latest",
 };
 
-let configFile = "";
-
 class UpdaterProc {
   private watcher: UpdateWatcher | null = null;
   constructor() {
@@ -32,7 +29,7 @@ class UpdaterProc {
     if (msg.type == CONFIG_MESSAGE) {
       if (this.watcher != null) this.watcher.stop();
 
-      const userData = app.getPath("userData");
+      const userData = msg.args[1];
       this.watcher = createUpdateWatcher(
         msg.args[0],
         join(userData, "updates")
@@ -48,12 +45,12 @@ const sendInstall = (path: string) => {
 };
 
 const createUpdateWatcher = (
-  settings: Setting,
+  settings: SettingData,
   savePath: string
 ): UpdateWatcher => {
-  const owner = settings.getChild("user").value;
-  const repo = settings.getChild("repo").value;
-  const token = settings.getChild("password").value;
+  const owner = settings.children["user"].value;
+  const repo = settings.children["repo"].value;
+  const token = settings.children["password"].value;
 
   return new UpdateWatcher({
     artifactName: ARTEFACT_MAP[process.platform],
@@ -66,3 +63,6 @@ const createUpdateWatcher = (
     installCallBack: sendInstall,
   });
 };
+
+const upd = new UpdaterProc();
+console.log("Updater initialized");
