@@ -1,4 +1,4 @@
-import { SingleSetting, Settings } from "main/lib/settings";
+import { SettingData } from "main/lib/settings";
 import React, { ChangeEvent } from "react";
 
 import "./Settings.css";
@@ -7,45 +7,48 @@ import "./Settings.css";
 type T = any;
 
 type SettingsState = {
-  settings: Settings;
+  settings: SettingData;
 };
 
-type SettingsProps = {
-  settings: Settings;
-};
-
-class SettingsMain extends React.Component<SettingsProps, SettingsState> {
+class SettingsMain extends React.Component<{}, SettingsState> {
   state = {
-    settings: this.props.settings,
+    settings: {
+      name: "cfg",
+      visible: true,
+      value: undefined,
+      description: "Silverkey2 Settings",
+      help: "",
+      children: {} as { [k: string]: SettingData },
+    } as SettingData,
   };
   async componentDidMount(): Promise<void> {
     const settings = await window.eRPC.getSettings();
     this.setState({ settings: settings });
   }
 
-  createSingleSetting(key: string, setting: SingleSetting<T>): JSX.Element {
-    if (typeof setting.value == "object") {
+  createSingleSetting(settingName: string, setting: SettingData): JSX.Element {
+    if (setting.value == undefined) {
       const subList: JSX.Element[] = [];
-      // eslint-disable-next-line
-      for (const [k, v] of Object.entries(setting.value)) {
+      for (const childName in setting.children) {
+        const child = setting.children[childName];
         subList.push(
-          this.createSingleSetting(`${key} ${k}`, v as SingleSetting<T>)
+          this.createSingleSetting(`${settingName} ${childName}`, child)
         );
       }
       return (
-        <div className="settings-group" key={key}>
+        <div className="settings-group" key={settingName}>
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-group-content">{subList}</div>
         </div>
       );
     } else if (typeof setting.value == "boolean") {
       return (
-        <div className="single-setting" key={key}>
+        <div className="single-setting" key={settingName}>
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-checkbox">
             <input
               type="checkbox"
-              data-key={key}
+              data-key={settingName}
               checked={setting.value}
               onChange={this.onInputChange}
             />
@@ -54,12 +57,12 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
       );
     } else {
       return (
-        <div className="single-setting" key={key}>
+        <div className="single-setting" key={settingName}>
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-text">
             <input
               type="text"
-              data-key={key}
+              data-key={settingName}
               value={setting.value as string}
               onChange={this.onInputChange}
             />
@@ -68,28 +71,22 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
       );
     }
   }
-
-  renderSettings(): JSX.Element[] {
-    const res: JSX.Element[] = [];
-    for (const [k, v] of Object.entries(this.state.settings)) {
-      res.push(this.createSingleSetting(k, v as SingleSetting<T>));
-    }
-    return res;
-  }
   /* eslint-disable */
   onInputChange = (evt: ChangeEvent<HTMLInputElement>) => {
     const keypath = (evt.target.dataset["key"] as string).split(" ");
-    let origSettings = structuredClone(this.state.settings) as any;
+    keypath.shift();
+    console.log("Key path", keypath);
+    let origSettings = structuredClone(this.state.settings);
     let settings = origSettings;
     for (const key of keypath) {
-      settings = settings[key];
-      if (settings == undefined) {
+      console.log("Dump set", settings, key);
+      if (settings == undefined || settings.value != undefined) {
+        console.error(
+          `Error finding setting by path ${keypath}. Setting ${settings.name} has defined value`
+        );
         return;
       }
-      if (typeof settings.value != "object") {
-        break;
-      }
-      settings = settings.value;
+      settings = settings.children[key];
     }
     if (evt.target.type == "checkbox") {
       settings.value = evt.target.checked;
@@ -111,8 +108,10 @@ class SettingsMain extends React.Component<SettingsProps, SettingsState> {
   };
   render(): React.ReactNode {
     console.log("Start Rendering");
-    let settings: JSX.Element[] = [];
-    settings = this.renderSettings();
+    const settings = this.createSingleSetting(
+      this.state.settings.name,
+      this.state.settings
+    );
     const saveBtn = "\u2714\uFE0F";
     const cancelBtn = "\u274C";
     window.requestAnimationFrame(() => {

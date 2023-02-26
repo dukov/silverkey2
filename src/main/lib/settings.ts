@@ -39,17 +39,34 @@ type SettingParams = {
   eventName?: string;
 };
 
+export interface SettingData {
+  name: string;
+  visible: boolean;
+  description: string;
+  help: string;
+  value: SettingValueType;
+  children: { [key: string]: SettingData };
+}
+
 export class Setting extends EventEmitter {
   name: string;
   visible: boolean;
+  description: string;
+  help: string = "";
   eventName?: string;
   private _children: { [key: string]: Setting } = {};
   private _val: SettingValueType;
-  constructor(name: string, value: SettingValueType, params?: SettingParams) {
+  constructor(
+    name: string,
+    value: SettingValueType,
+    description: string,
+    params?: SettingParams
+  ) {
     super();
     let actualParams: SettingParams = { visible: true };
     if (params) actualParams = params;
     this.name = name;
+    this.description = description;
     this.visible = actualParams.visible;
     this._val = value;
     this.eventName = actualParams.eventName;
@@ -60,6 +77,35 @@ export class Setting extends EventEmitter {
   set value(newVal: SettingValueType) {
     this._val = newVal;
     if (this.eventName) this.emit(this.eventName, newVal);
+  }
+
+  toData(): SettingData {
+    let res: SettingData = {
+      name: this.name,
+      visible: this.visible,
+      description: this.description,
+      help: this.help,
+      value: this.value,
+      children: {},
+    };
+    if (this.value == undefined) {
+      for (const childName of this.getChildrenNames()) {
+        res.children[childName] = this.getChild(childName).toData();
+      }
+    }
+    return res;
+  }
+
+  fromData(data: SettingData) {
+    if (this.value == undefined) {
+      for (const childName of this.getChildrenNames()) {
+        if (data.children[childName]) {
+          this.getChild(childName).fromData(data.children[childName]);
+        }
+      }
+    } else {
+      this.value = data.value;
+    }
   }
 
   addChild(ch: Setting) {
@@ -96,33 +142,39 @@ export class Setting extends EventEmitter {
 }
 
 export const getDefaultSettings = (): Setting => {
-  const updateCfg = new Setting("updateSourceConfig", false);
+  // Config for Artifact source
+  const updateCfg = new Setting(
+    "updateSourceConfig",
+    undefined,
+    "Artifact Source"
+  );
   updateCfg.addChild(
-    new Setting("updateSource", UpdateSource.github, {
+    new Setting("updateSource", UpdateSource.github, "Type", {
       visible: true,
       eventName: UPDATE_SRC_CONFIG_EVT,
     })
   );
   updateCfg.addChild(
-    new Setting("user", "dukov", {
+    new Setting("user", "dukov", "User", {
       visible: true,
       eventName: UPDATE_SRC_CONFIG_EVT,
     })
   );
   updateCfg.addChild(
-    new Setting("repo", "silverkey2", {
+    new Setting("repo", "silverkey2", "Repository", {
       visible: true,
       eventName: UPDATE_SRC_CONFIG_EVT,
     })
   );
   updateCfg.addChild(
-    new Setting("password", "", {
+    new Setting("password", "", "Password", {
       visible: true,
       eventName: UPDATE_SRC_CONFIG_EVT,
     })
   );
 
-  const checkUpdates = new Setting("checkUpdates", false, {
+  // Config for Check updates
+  const checkUpdates = new Setting("checkUpdates", false, "Check Updates", {
     visible: true,
     eventName: CHECK_UPDATES_EVT,
   });
@@ -130,8 +182,9 @@ export const getDefaultSettings = (): Setting => {
     updateCfg.visible = val;
   });
 
-  const res = new Setting("cfg", undefined);
-  res.addChild(new Setting("freePlanePath", ""));
+  // Root config
+  const res = new Setting("cfg", undefined, "Silverkey2 Settings");
+  res.addChild(new Setting("freePlanePath", "", "Path to Freeplane binary"));
   res.addChild(checkUpdates);
   res.addChild(updateCfg);
   return res;
