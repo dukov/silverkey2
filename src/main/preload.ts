@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { Settings } from "./lib/settings";
+import { SettingData } from "./lib/settings";
 
 const electronRPC = {
   getKeys: (): Promise<string[]> =>
@@ -10,12 +10,11 @@ const electronRPC = {
     ipcRenderer.invoke("set-val", key, value),
   deleteKey: (key: string) => ipcRenderer.invoke("delete-key", key),
   appHide: () => ipcRenderer.invoke("app-hide"),
-  isSettings: (cb: (e: Electron.IpcRendererEvent, s: Settings) => void) =>
-    ipcRenderer.on("show-settings", cb),
-  getSettings: (): Promise<Settings> => {
-    return ipcRenderer.invoke("get-settings") as Promise<Settings>;
+  isSettings: (cb: () => void) => ipcRenderer.on("show-settings", cb),
+  getSettings: (): Promise<SettingData> => {
+    return ipcRenderer.invoke("get-settings") as Promise<SettingData>;
   },
-  saveSettings: (settings: Settings) =>
+  saveSettings: (settings: SettingData) =>
     ipcRenderer.invoke("save-settings", settings),
   runFreePlane: (path: string) => ipcRenderer.invoke("run-freeplane", path),
   getFpPath: (): Promise<string> =>

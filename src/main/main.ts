@@ -18,7 +18,7 @@ import { FreePlaneRunner } from "./lib/freeplane";
 import { FileDB } from "./lib/localdb/filedb";
 import {
   CHECK_UPDATES_EVT,
-  Setting,
+  SettingData,
   SettingsHandler,
   UPDATE_SRC_CONFIG_EVT,
 } from "./lib/settings";
@@ -102,7 +102,7 @@ const createTray = async () => {
         } else {
           win = mainWindow;
         }
-        win.webContents.send("show-settings", settings.settings);
+        win.webContents.send("show-settings");
       },
     },
     {
@@ -211,11 +211,11 @@ ipcMain.handle("app-hide", () => {
 });
 
 ipcMain.handle("get-settings", () => {
-  return settings.settings;
+  return settings.settings.toData();
 });
 
-ipcMain.handle("save-settings", (_, newSettings: Setting) => {
-  settings.settings = newSettings;
+ipcMain.handle("save-settings", (_, newSettings: SettingData) => {
+  settings.settings.fromData(newSettings);
   settings.save();
   console.log("Settings saved");
 });

@@ -10,8 +10,8 @@ const app = document.getElementById("app");
 if (app == null) throw new Error("app element not found");
 const root = createRoot(app);
 
-window.eRPC.isSettings((_, settings: setLib.Settings) => {
-  root.render(<Settings settings={settings} />);
+window.eRPC.isSettings(() => {
+  root.render(<Settings />);
 });
 
 root.render(<Main />);

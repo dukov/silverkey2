@@ -34,7 +34,7 @@ class RunFreeplaneBtn extends React.Component<{}, FreeplaneBtnState> {
       const path = evt.target.files[0].path;
       void (async () => {
         const settings = await window.eRPC.getSettings();
-        settings.freePlanePath.value = path;
+        settings.children["freePlanePath"].value = path;
         await window.eRPC.saveSettings(settings);
         await this.runFreeplane(path);
       })();
