@@ -5,6 +5,7 @@ import { CONFIG_MESSAGE, INSTALL_MESSAGE, Message } from "./interface";
 export class Updater {
   private _proc: UtilityProcess | null = null;
   private path: string;
+  // eslint-disable-next-line
   private msgTypeMap: { [k: string]: (...arg: any[]) => void } = {};
   private _settings: Setting = getDefaultSettings();
   constructor(path: string, settings: Setting) {
@@ -45,15 +46,16 @@ export class Updater {
 
       const func = this.msgTypeMap[updMsg.type];
       if (func != undefined) {
+        // eslint-disable-next-line
         func(...updMsg.args);
       }
     });
   }
 
-  private install(path: string) {
+  private install = (path: string) => {
     installPackage(path);
     app.quit();
-  }
+  };
 
   stop() {
     if (this._proc != null) {

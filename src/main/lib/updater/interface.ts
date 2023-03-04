@@ -17,5 +17,6 @@ export interface ArtifactSourceClient extends EventEmitter {
 
 export type Message = {
   type: string;
+  // eslint-disable-next-line
   args: any[];
 };

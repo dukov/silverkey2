@@ -157,7 +157,7 @@ const userData = app.getPath("userData");
 console.log("User data dir", userData);
 const db = new FileDB(join(userData));
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
-let updater: Updater = new Updater(
+const updater: Updater = new Updater(
   join(__dirname, "updater.js"),
   settings.settings
 );
