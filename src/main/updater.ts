@@ -1,6 +1,5 @@
-import { app } from "electron";
 import { join } from "path";
-import { Setting, SettingData } from "./lib/settings";
+import { SettingData } from "./lib/settings";
 import {
   CONFIG_MESSAGE,
   INSTALL_MESSAGE,
@@ -29,9 +28,9 @@ class UpdaterProc {
     if (msg.type == CONFIG_MESSAGE) {
       if (this.watcher != null) this.watcher.stop();
 
-      const userData = msg.args[1];
+      const userData = msg.args[1] as string;
       this.watcher = createUpdateWatcher(
-        msg.args[0],
+        msg.args[0] as SettingData,
         join(userData, "updates")
       );
       this.watcher.run();
@@ -39,7 +38,7 @@ class UpdaterProc {
   }
 }
 
-const sendInstall = (path: string) => {
+const sendInstall = () => {
   const msg: Message = { type: INSTALL_MESSAGE, args: [] };
   process.parentPort.postMessage(msg);
 };
@@ -64,5 +63,5 @@ const createUpdateWatcher = (
   });
 };
 
-const upd = new UpdaterProc();
+new UpdaterProc();
 console.log("Updater initialized");

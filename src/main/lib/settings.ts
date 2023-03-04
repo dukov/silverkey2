@@ -52,7 +52,7 @@ export class Setting extends EventEmitter {
   name: string;
   visible: boolean;
   description: string;
-  help: string = "";
+  help = "";
   eventName?: string;
   private _children: { [key: string]: Setting } = {};
   private _val: SettingValueType;
@@ -80,7 +80,7 @@ export class Setting extends EventEmitter {
   }
 
   toData(): SettingData {
-    let res: SettingData = {
+    const res: SettingData = {
       name: this.name,
       visible: this.visible,
       description: this.description,
@@ -208,6 +208,7 @@ export class SettingsHandler {
 
   private _load(path: string): Setting {
     const defaults = getDefaultSettings();
+    // eslint-disable-next-line
     let cfg: { [k: string]: any } = {};
     try {
       const content = fs.readFileSync(path, { encoding: "utf-8" });
