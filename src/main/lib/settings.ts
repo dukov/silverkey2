@@ -4,6 +4,8 @@ import { EventEmitter } from "events";
 export const UPDATE_SRC_CONFIG_EVT = "cfg.updateSourceConfig";
 export const CHECK_UPDATES_EVT = "cfg.checkUpdates";
 
+declare const IS_PROD: boolean;
+
 enum UpdateSource {
   github = "github",
 }
@@ -146,7 +148,8 @@ export const getDefaultSettings = (): Setting => {
   const updateCfg = new Setting(
     "updateSourceConfig",
     undefined,
-    "Artifact Source"
+    "Artifact Source",
+    { visible: !IS_PROD }
   );
   updateCfg.addChild(
     new Setting("updateSource", UpdateSource.github, "Type", {
@@ -175,7 +178,7 @@ export const getDefaultSettings = (): Setting => {
 
   // Config for Check updates
   const checkUpdates = new Setting("checkUpdates", false, "Check Updates", {
-    visible: true,
+    visible: !IS_PROD,
     eventName: CHECK_UPDATES_EVT,
   });
   checkUpdates.on(CHECK_UPDATES_EVT, (val: boolean) => {

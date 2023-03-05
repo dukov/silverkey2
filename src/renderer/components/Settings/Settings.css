@@ -12,6 +12,10 @@
   flex-direction: column;
 }
 
+.settings-group-hidden {
+  display: none;
+}
+
 .settings-group-content {
   display: flex;
   flex-direction: column;
@@ -23,6 +27,10 @@
   flex-direction: row;
   justify-content: space-between;
   padding-bottom: 30px;
+}
+
+.single-setting-hidden {
+  display: none;
 }
 
 .setting-buttons {
