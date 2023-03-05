@@ -36,14 +36,20 @@ class SettingsMain extends React.Component<{}, SettingsState> {
         );
       }
       return (
-        <div className="settings-group" key={settingName}>
+        <div
+          className={`settings-group${setting.visible ? "" : "-hidden"}`}
+          key={settingName}
+        >
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-group-content">{subList}</div>
         </div>
       );
     } else if (typeof setting.value == "boolean") {
       return (
-        <div className="single-setting" key={settingName}>
+        <div
+          className={`single-setting${setting.visible ? "" : "-hidden"}`}
+          key={settingName}
+        >
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-checkbox">
             <input
@@ -57,7 +63,10 @@ class SettingsMain extends React.Component<{}, SettingsState> {
       );
     } else {
       return (
-        <div className="single-setting" key={settingName}>
+        <div
+          className={`single-setting${setting.visible ? "" : "-hidden"}`}
+          key={settingName}
+        >
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-text">
             <input
@@ -105,7 +114,6 @@ class SettingsMain extends React.Component<{}, SettingsState> {
     location.reload();
   };
   render(): React.ReactNode {
-    console.log("Start Rendering");
     const settings = this.createSingleSetting(
       this.state.settings.name,
       this.state.settings
