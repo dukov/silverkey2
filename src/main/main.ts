@@ -15,7 +15,8 @@ import {
 import { join } from "path";
 
 import { FreePlaneRunner } from "./lib/freeplane";
-import { FileDB } from "./lib/localdb/filedb";
+import { KVDBClient } from "./lib/kvdb/kvdb";
+import { DB_FILE_NAME, FileDB } from "./lib/localdb/filedb";
 import {
   CHECK_UPDATES_EVT,
   SettingData,
@@ -155,7 +156,7 @@ app.on("window-all-closed", () => {
 
 const userData = app.getPath("userData");
 console.log("User data dir", userData);
-const db = new FileDB(join(userData));
+const db = new KVDBClient(userData);
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
 const updater: Updater = new Updater(
   join(__dirname, "updater.js"),
@@ -174,9 +175,12 @@ settings.settings.on(UPDATE_SRC_CONFIG_EVT, () => {
 settings.reload();
 console.log("Settings loaded");
 
-const freeplane: FreePlaneRunner = new FreePlaneRunner(db.path, () => {
-  if (!mainWindow) createWindow();
-});
+const freeplane: FreePlaneRunner = new FreePlaneRunner(
+  join(userData, DB_FILE_NAME),
+  () => {
+    if (!mainWindow) createWindow();
+  }
+);
 if (
   freeplane.path == null &&
   settings.settings.getChild("freePlanePath").value != ""
