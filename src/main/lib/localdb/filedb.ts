@@ -2,8 +2,9 @@ import fs from "fs";
 import { join } from "path";
 import { FREEPLANE_BASE } from "./constants";
 import jsdom from "jsdom";
+import { KVDB } from "../kvdb/types";
 
-const DB_FILE_NAME = "kvdb.mm";
+export const DB_FILE_NAME = "kvdb.mm";
 
 // eslint-disable-next-line
 class FileWatcher {
@@ -18,7 +19,7 @@ class FileWatcher {
   }
 }
 
-export class FileDB {
+export class FileDB implements KVDB {
   contents: { [x: string]: string };
   path: string;
   private dbWatcher: FileWatcher;
