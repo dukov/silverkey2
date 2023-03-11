@@ -19,6 +19,8 @@ const electronRPC = {
   runFreePlane: (path: string) => ipcRenderer.invoke("run-freeplane", path),
   getFpPath: (): Promise<string> =>
     ipcRenderer.invoke("get-fp-path") as Promise<string>,
+  getKVDBs: (): Promise<string[]> =>
+    ipcRenderer.invoke("get-kvdbs") as Promise<string[]>,
 };
 
 contextBridge.exposeInMainWorld("eRPC", electronRPC);

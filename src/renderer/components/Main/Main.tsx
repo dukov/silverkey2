@@ -14,6 +14,7 @@ type MainState = {
   selectedID: number | null;
   addOrSave: AddKeyBtnState;
   valueToAdd: string;
+  dbNames: string[];
 };
 
 class Main extends React.Component<{}, MainState> {
@@ -25,6 +26,7 @@ class Main extends React.Component<{}, MainState> {
     selectedID: 0,
     addOrSave: AddKeyBtnState.Add,
     valueToAdd: "",
+    dbNames: [],
   };
   allKeys: string[] = [];
   async readAllKeys(): Promise<string[]> {
@@ -34,6 +36,8 @@ class Main extends React.Component<{}, MainState> {
   }
   async componentDidMount() {
     this.allKeys = await this.readAllKeys();
+    const dbNames = await window.eRPC.getKVDBs();
+    this.setState({ dbNames: dbNames });
   }
 
   private _filterKeys = (flt: string): string[] => {
@@ -133,6 +137,7 @@ class Main extends React.Component<{}, MainState> {
     return (
       <div className="main">
         <SearchRow
+          databases={this.state.dbNames}
           searchVal={this.state.searchVal}
           searchFocus={this.state.searchFocus}
           selectedKey={

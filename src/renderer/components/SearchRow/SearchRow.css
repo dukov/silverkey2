@@ -7,3 +7,14 @@
   width: 12px;
 }
 
+.search-db select {
+  background: transparent;
+  width: 80px;
+  height: 100%;
+  outline: none;
+  border: none;
+}
+
+.search-magnifier {
+  font-size: xx-large;
+}

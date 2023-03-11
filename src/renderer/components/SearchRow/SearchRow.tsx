@@ -12,6 +12,7 @@ type SearchRowExt = {
   searchFocus: boolean;
   selectedKey: string;
   addOrSave: AddKeyBtnState;
+  databases: string[];
   saveKey: () => Promise<void>;
   showAddKey: () => void;
 };
@@ -20,9 +21,18 @@ type SearchRowProp = SearchInputProps & SearchRowExt;
 
 class SearchRow extends React.Component<SearchRowProp> {
   render() {
+    //const magnifier = "\u1F50E";
     return (
       <div className="search-row">
         <div className="search-left"></div>
+        <div className="search-db">
+          <select>
+            {this.props.databases.map((val: string) => {
+              return <option value={val}>{val}</option>;
+            })}
+          </select>
+        </div>
+        <div className="search-magnifier">&#x1F50E;</div>
         <SearchInput
           searchVal={this.props.searchVal}
           selectedKey={this.props.selectedKey}
