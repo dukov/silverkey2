@@ -232,3 +232,7 @@ ipcMain.handle("run-freeplane", (_, path: string) => {
   freeplane.path = path;
   freeplane.run();
 });
+
+ipcMain.handle("get-kvdbs", () => {
+  return db.getDBNames();
+});

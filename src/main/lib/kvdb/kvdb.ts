@@ -14,6 +14,9 @@ export class KVDBClient {
     this.selectedDB = "default";
     this.dbs[this.selectedDB] = KVDB_DRIVERS["localfile"](defaultDbPath);
   }
+  getDBNames(): string[] {
+    return Object.keys(this.dbs);
+  }
   addDB(name: string, driver: string, url: string) {
     if (!(driver in KVDB_DRIVERS)) {
       throw new Error(`Unknown KVDB driver ${driver}`);
