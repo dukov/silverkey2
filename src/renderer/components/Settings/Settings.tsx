@@ -1,5 +1,5 @@
 import { SettingData } from "main/lib/settings";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, MouseEvent } from "react";
 
 import "./Settings.css";
 
@@ -26,13 +26,47 @@ class SettingsMain extends React.Component<{}, SettingsState> {
     this.setState({ settings: settings });
   }
 
-  createSingleSetting(settingName: string, setting: SettingData): JSX.Element {
+  createSingleSetting(
+    settingName: string,
+    setting: SettingData,
+    dynamic: boolean
+  ): JSX.Element {
     if (setting.value == undefined) {
       const subList: JSX.Element[] = [];
       for (const childName in setting.children) {
         const child = setting.children[childName];
         subList.push(
-          this.createSingleSetting(`${settingName} ${childName}`, child)
+          this.createSingleSetting(
+            `${settingName} ${childName}`,
+            child,
+            setting.dynamic
+          )
+        );
+      }
+      let removeBtn: JSX.Element | undefined = undefined;
+      if (dynamic) {
+        const removeLnk = "\u2796";
+        removeBtn = (
+          <div className="remove-setting">
+            <a
+              href="#"
+              data-key={settingName}
+              onClick={this.onRemoveSettingClick}
+            >
+              {removeLnk}
+            </a>
+          </div>
+        );
+      }
+      let addButton: JSX.Element | undefined = undefined;
+      if (setting.dynamic) {
+        const addLnk = "\u2795";
+        addButton = (
+          <div className="add-setting">
+            <a href="#" data-key={settingName} onClick={this.onAddSettingClick}>
+              {addLnk}
+            </a>
+          </div>
         );
       }
       return (
@@ -40,8 +74,12 @@ class SettingsMain extends React.Component<{}, SettingsState> {
           className={`settings-group${setting.visible ? "" : "-hidden"}`}
           key={settingName}
         >
-          <div className="settings-desc">{setting.description}</div>
+          <div className="settings-group-header">
+            <div className="settings-desc">{setting.description}</div>
+            {addButton}
+          </div>
           <div className="settings-group-content">{subList}</div>
+          {removeBtn}
         </div>
       );
     } else if (typeof setting.value == "boolean") {
@@ -86,6 +124,52 @@ class SettingsMain extends React.Component<{}, SettingsState> {
     keypath.shift();
     let origSettings = structuredClone(this.state.settings);
     let settings = origSettings;
+    let parent: SettingData | undefined = undefined;
+    let dynamicSetting: SettingData | undefined = undefined;
+    for (const key of keypath) {
+      if (settings == undefined || settings.value != undefined) {
+        console.error(
+          `Error finding setting by path ${keypath}. Setting ${settings.name} has defined value`
+        );
+        return;
+      }
+      if (settings.dynamic) {
+        dynamicSetting = settings;
+      }
+      parent = settings;
+      settings = settings.children[key];
+    }
+    if (evt.target.type == "checkbox") {
+      settings.value = evt.target.checked;
+    } else {
+      settings.value = evt.target.value;
+      if (dynamicSetting != undefined && settings.name == "name") {
+        if (parent != undefined) {
+          delete dynamicSetting.children[parent.name];
+          parent.name = settings.value;
+          parent.description = settings.value;
+          dynamicSetting.children[parent.name] = parent;
+        }
+      }
+    }
+    console.log(evt.target.dataset["key"] as string);
+    this.setState({ settings: origSettings });
+  };
+  /* eslint-enable */
+
+  onRemoveSettingClick = (evt: MouseEvent<HTMLAnchorElement>) => {
+    const keypath = (
+      evt.currentTarget.getAttribute("data-key") as string
+    ).split(" ");
+
+    keypath.shift();
+    const settingName = keypath.pop();
+    if (settingName == undefined) {
+      console.error("Key path can not be empty");
+      return;
+    }
+    let origSettings = structuredClone(this.state.settings);
+    let settings = origSettings;
     for (const key of keypath) {
       if (settings == undefined || settings.value != undefined) {
         console.error(
@@ -95,15 +179,60 @@ class SettingsMain extends React.Component<{}, SettingsState> {
       }
       settings = settings.children[key];
     }
-    if (evt.target.type == "checkbox") {
-      settings.value = evt.target.checked;
-    } else {
-      settings.value = evt.target.value;
+    delete settings.children[settingName];
+    this.setState({ settings: origSettings });
+  };
+
+  onAddSettingClick = (evt: MouseEvent<HTMLAnchorElement>) => {
+    const keypath = (
+      evt.currentTarget.getAttribute("data-key") as string
+    ).split(" ");
+
+    keypath.shift();
+    let origSettings = structuredClone(this.state.settings);
+    let settings = origSettings;
+    for (const key of keypath) {
+      if (settings == undefined || settings.value != undefined) {
+        console.error(
+          `Error finding setting by path ${keypath}. Setting ${settings.name} has defined value`
+        );
+        return;
+      }
+      settings = settings.children[key];
     }
+
+    settings.children["new_database"] = {
+      name: "new_database",
+      visible: true,
+      description: "new_database",
+      help: "",
+      value: undefined,
+      children: {
+        name: {
+          name: "name",
+          visible: true,
+          description: "Name",
+          help: "",
+          value: "new_database",
+          children: {},
+          dynamic: false,
+        },
+        url: {
+          name: "url",
+          visible: true,
+          description: "URL",
+          help: "",
+          value: "",
+          children: {},
+          dynamic: false,
+        },
+      },
+      dynamic: false,
+    };
 
     this.setState({ settings: origSettings });
   };
-  /* eslint-enable */
+
   onSaveSettings = () => {
     void (async () => {
       await window.eRPC.saveSettings(this.state.settings);
@@ -116,7 +245,8 @@ class SettingsMain extends React.Component<{}, SettingsState> {
   render(): React.ReactNode {
     const settings = this.createSingleSetting(
       this.state.settings.name,
-      this.state.settings
+      this.state.settings,
+      false
     );
     const saveBtn = "\u2714\uFE0F";
     const cancelBtn = "\u274C";
