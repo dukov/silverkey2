@@ -8,8 +8,9 @@
 .settings-group {
   display: flex;
   border: 1px solid gray;
-  border-radius: 10px;
+  border-radius: 25px;
   flex-direction: column;
+  margin-bottom: 5px;
 }
 
 .settings-group-hidden {
@@ -19,14 +20,14 @@
 .settings-group-content {
   display: flex;
   flex-direction: column;
-  margin: 10px;
+  margin: 5px;
 }
 
 .single-setting {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding-bottom: 30px;
+  padding-bottom: 10px;
 }
 
 .single-setting-hidden {
@@ -39,9 +40,14 @@
   justify-content: space-between;
 }
 
+.settings-group-header {
+  display: flex;
+  flex-direction: row;
+}
+
 .settings-desc {
   padding-right: 12px;
-  margin-left: 10px;
+  margin-left: 15px;
   font-weight: 400;
   font-size: 1rem;
 }
@@ -69,4 +75,24 @@
 .cancel-button a {
   text-decoration: none;
   font-size: xx-large;
+}
+
+.remove-setting {
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.remove-setting a {
+  text-decoration: none;
+  font-size: large;
+}
+
+.add-setting {
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.add-setting a {
+  text-decoration: none;
+  font-size: large;
 }

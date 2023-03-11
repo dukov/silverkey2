@@ -1,5 +1,8 @@
 import * as fs from "fs";
 import { EventEmitter } from "events";
+import { join } from "path";
+import { DB_FILE_NAME } from "./localdb/filedb";
+import { app } from "electron";
 
 export const UPDATE_SRC_CONFIG_EVT = "cfg.updateSourceConfig";
 export const CHECK_UPDATES_EVT = "cfg.checkUpdates";
@@ -48,6 +51,7 @@ export interface SettingData {
   help: string;
   value: SettingValueType;
   children: { [key: string]: SettingData };
+  dynamic: boolean;
 }
 
 export class Setting extends EventEmitter {
@@ -56,6 +60,7 @@ export class Setting extends EventEmitter {
   description: string;
   help = "";
   eventName?: string;
+  dynamic = false;
   private _children: { [key: string]: Setting } = {};
   private _val: SettingValueType;
   constructor(
@@ -89,6 +94,7 @@ export class Setting extends EventEmitter {
       help: this.help,
       value: this.value,
       children: {},
+      dynamic: this.dynamic,
     };
     if (this.value == undefined) {
       for (const childName of this.getChildrenNames()) {
@@ -100,6 +106,7 @@ export class Setting extends EventEmitter {
 
   fromData(data: SettingData) {
     if (this.value == undefined) {
+      this.dynamic = data.dynamic;
       for (const childName of this.getChildrenNames()) {
         if (data.children[childName]) {
           this.getChild(childName).fromData(data.children[childName]);
@@ -132,6 +139,7 @@ export class Setting extends EventEmitter {
     if (this.value != undefined && newSetting.value != undefined) {
       this.value = newSetting.value;
     } else if (this._val == undefined && newSetting.value == undefined) {
+      this.dynamic = newSetting.dynamic;
       for (const childName in this._children) {
         this._children[childName].update(newSetting.getChild(childName));
       }
@@ -185,11 +193,27 @@ export const getDefaultSettings = (): Setting => {
     updateCfg.visible = val;
   });
 
+  // Config for key-value databases
+  const defaultKVDB = new Setting("default", undefined, "default");
+  defaultKVDB.addChild(new Setting("name", "default", "Name"));
+  defaultKVDB.addChild(
+    new Setting("url", join(app.getPath("userData"), DB_FILE_NAME), "URL")
+  );
+
+  const kvDatabases = new Setting(
+    "kvDatabases",
+    undefined,
+    "Key-Value Databases"
+  );
+  kvDatabases.dynamic = true;
+  kvDatabases.addChild(defaultKVDB);
+
   // Root config
   const res = new Setting("cfg", undefined, "Silverkey2 Settings");
   res.addChild(new Setting("freePlanePath", "", "Path to Freeplane binary"));
   res.addChild(checkUpdates);
   res.addChild(updateCfg);
+  res.addChild(kvDatabases);
   return res;
 };
 
