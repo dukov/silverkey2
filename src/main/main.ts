@@ -156,8 +156,16 @@ app.on("window-all-closed", () => {
 
 const userData = app.getPath("userData");
 console.log("User data dir", userData);
-const db = new KVDBClient(userData);
+const db = new KVDBClient();
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
+
+const dbConf = settings.settings.getChild("kvDatabases");
+for (const dbName of dbConf.getChildrenNames()) {
+  const url = dbConf.getChild(dbName).getChild("url").value as string;
+  db.addDB(dbName, "localfile", url);
+}
+db.selectedDB = dbConf.getChildrenNames()[0];
+
 const updater: Updater = new Updater(
   join(__dirname, "updater.js"),
   settings.settings
