@@ -24,12 +24,7 @@ export class FileDB implements KVDB {
   path: string;
   private dbWatcher: FileWatcher;
   constructor(path: string) {
-    if (!fs.lstatSync(path).isDirectory()) {
-      throw new Error(
-        `Failed to load key-value DB. ${path} is not a directory`
-      );
-    }
-    this.path = join(path, DB_FILE_NAME);
+    this.path = path;
     this.contents = {};
     fs.readFile(this.path, (err, data) => {
       if (err) {
@@ -37,17 +32,7 @@ export class FileDB implements KVDB {
           `File ${this.path} does not exists initializing with empty DB`
         );
       } else {
-        try {
-          // eslint-disable-next-line
-          this.contents = JSON.parse(data.toString("utf-8"));
-          fs.copyFileSync(this.path, `${this.path}.backup`);
-        } catch (e) {
-          if (e instanceof SyntaxError) {
-            this.contents = new MindMap(data.toString("utf-8")).toDict();
-          } else {
-            throw e;
-          }
-        }
+        this.contents = new MindMap(data.toString("utf-8")).toDict();
       }
     });
 

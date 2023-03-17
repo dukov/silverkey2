@@ -8,12 +8,8 @@ const KVDB_DRIVERS: { [drvName: string]: (url: string) => KVDB } = {
 };
 
 export class KVDBClient {
-  selectedDB: string;
+  selectedDB = "";
   private dbs: { [name: string]: KVDB } = {};
-  constructor(defaultDbPath: string) {
-    this.selectedDB = "default";
-    this.dbs[this.selectedDB] = KVDB_DRIVERS["localfile"](defaultDbPath);
-  }
   getDBNames(): string[] {
     return Object.keys(this.dbs);
   }
