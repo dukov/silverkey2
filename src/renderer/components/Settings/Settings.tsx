@@ -21,6 +21,7 @@ class SettingsMain extends React.Component<{}, SettingsState> {
       children: {} as { [k: string]: SettingData },
     } as SettingData,
   };
+  private _idx = 0;
   async componentDidMount(): Promise<void> {
     const settings = await window.eRPC.getSettings();
     this.setState({ settings: settings });
@@ -31,6 +32,7 @@ class SettingsMain extends React.Component<{}, SettingsState> {
     setting: SettingData,
     dynamic: boolean
   ): JSX.Element {
+    this._idx++;
     if (setting.value == undefined) {
       const subList: JSX.Element[] = [];
       for (const childName in setting.children) {
@@ -72,7 +74,7 @@ class SettingsMain extends React.Component<{}, SettingsState> {
       return (
         <div
           className={`settings-group${setting.visible ? "" : "-hidden"}`}
-          key={settingName}
+          key={this._idx}
         >
           <div className="settings-group-header">
             <div className="settings-desc">{setting.description}</div>
@@ -86,7 +88,7 @@ class SettingsMain extends React.Component<{}, SettingsState> {
       return (
         <div
           className={`single-setting${setting.visible ? "" : "-hidden"}`}
-          key={settingName}
+          key={this._idx}
         >
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-checkbox">
@@ -103,7 +105,7 @@ class SettingsMain extends React.Component<{}, SettingsState> {
       return (
         <div
           className={`single-setting${setting.visible ? "" : "-hidden"}`}
-          key={settingName}
+          key={this._idx}
         >
           <div className="settings-desc">{setting.description}</div>
           <div className="settings-text">
@@ -235,6 +237,7 @@ class SettingsMain extends React.Component<{}, SettingsState> {
 
   onSaveSettings = () => {
     void (async () => {
+      console.log(this.state.settings);
       await window.eRPC.saveSettings(this.state.settings);
     })();
     location.reload();
@@ -243,6 +246,7 @@ class SettingsMain extends React.Component<{}, SettingsState> {
     location.reload();
   };
   render(): React.ReactNode {
+    this._idx = 0;
     const settings = this.createSingleSetting(
       this.state.settings.name,
       this.state.settings,
