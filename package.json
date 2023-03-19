@@ -8,6 +8,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/jsdom": "^20.0.1",
+    "@types/lodash": "^4.14.191",
     "@types/react": "^18.0.27",
     "@types/react-dom": "^18.0.10",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
@@ -24,6 +25,7 @@
     "html-webpack-plugin": "^5.5.0",
     "jsdom": "^21.1.0",
     "jszip": "^3.10.1",
+    "lodash": "^4.17.21",
     "octokit": "^2.0.14",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -36,6 +38,7 @@
   "scripts": {
     "lint": "cross-env NODE_ENV=development eslint . --ext .js,.jsx,.ts,.tsx",
     "build": "webpack --config ./webpack.config.js",
+    "build-dbg": "cross-env DBG=1 webpack --config ./webpack.config.js",
     "build-prod": "cross-env NODE_ENV=\"production\" webpack --config ./webpack.config.js",
     "start": "yarn run build && electron .",
     "start-prod": "yarn run build-prod && electron .",

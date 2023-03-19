@@ -1,8 +1,10 @@
 import * as fs from "fs";
 import { EventEmitter } from "events";
 import { join } from "path";
-import { DB_FILE_NAME } from "./localdb/filedb";
 import { app } from "electron";
+import { cloneDeep } from "lodash";
+
+import { DB_FILE_NAME } from "./localdb/filedb";
 
 export const UPDATE_SRC_CONFIG_EVT = "cfg.updateSourceConfig";
 export const CHECK_UPDATES_EVT = "cfg.checkUpdates";
@@ -20,7 +22,19 @@ const deepLoad = (setting: Setting, cfg: any) => {
     setting.value = cfg;
   } else {
     for (const name of setting.getChildrenNames()) {
-      if (cfg[name]) deepLoad(setting.getChild(name), cfg[name]);
+      if (name in cfg) {
+        let child = setting.getChild(name);
+        if (child.dynamic) {
+          let dynamicSample = child.getChild(child.getChildrenNames()[0]);
+          for (const cfgChild in cfg[name]) {
+            let newS = cloneDeep(dynamicSample);
+            deepLoad(newS, cfg[name][cfgChild]);
+            child.addChild(newS);
+          }
+        } else {
+          deepLoad(child, cfg[name]);
+        }
+      }
     }
   }
 };
@@ -107,10 +121,12 @@ export class Setting extends EventEmitter {
   fromData(data: SettingData) {
     if (this.value == undefined) {
       this.dynamic = data.dynamic;
-      for (const childName of this.getChildrenNames()) {
-        if (data.children[childName]) {
-          this.getChild(childName).fromData(data.children[childName]);
-        }
+      this._children = {};
+      for (const childName in data.children) {
+        let child = data.children[childName];
+        let newS = new Setting(child.name, child.value, child.description);
+        newS.fromData(child);
+        this.addChild(newS);
       }
     } else {
       this.value = data.value;

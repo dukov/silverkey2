@@ -9,6 +9,7 @@ const commitHash = require("child_process")
 module.exports = [
   {
     mode: process.env.NODE_ENV ? process.env.NODE_ENV : "development",
+    devtool: process.env.DBG ? "cheap-source-map" : undefined,
     entry: {
       main: "./src/main/main.ts",
       preload: "./src/main/preload.ts",
