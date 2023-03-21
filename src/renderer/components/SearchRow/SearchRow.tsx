@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent } from "react";
 
 import "./SearchRow.css";
 
@@ -13,20 +13,26 @@ type SearchRowExt = {
   selectedKey: string;
   addOrSave: AddKeyBtnState;
   databases: string[];
+  selectedDB: string;
   saveKey: () => Promise<void>;
   showAddKey: () => void;
+  changeDB: (dbName: string) => void;
 };
 
 type SearchRowProp = SearchInputProps & SearchRowExt;
 
 class SearchRow extends React.Component<SearchRowProp> {
+  onDbChange = (evt: ChangeEvent<HTMLSelectElement>) => {
+    this.props.changeDB(evt.target.value);
+  };
+
   render() {
     //const magnifier = "\u1F50E";
     return (
       <div className="search-row">
         <div className="search-left"></div>
         <div className="search-db">
-          <select>
+          <select onChange={this.onDbChange} value={this.props.selectedDB}>
             {this.props.databases.map((val: string) => {
               return <option value={val}>{val}</option>;
             })}

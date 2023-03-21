@@ -21,6 +21,9 @@ const electronRPC = {
     ipcRenderer.invoke("get-fp-path") as Promise<string>,
   getKVDBs: (): Promise<string[]> =>
     ipcRenderer.invoke("get-kvdbs") as Promise<string[]>,
+  getSelectedDB: (): Promise<string> =>
+    ipcRenderer.invoke("get-selected-db") as Promise<string>,
+  selectDB: (dbName: string) => ipcRenderer.invoke("select-db", dbName),
 };
 
 contextBridge.exposeInMainWorld("eRPC", electronRPC);

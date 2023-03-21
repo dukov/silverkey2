@@ -28,6 +28,7 @@ const deepLoad = (setting: Setting, cfg: any) => {
           let dynamicSample = child.getChild(child.getChildrenNames()[0]);
           for (const cfgChild in cfg[name]) {
             let newS = cloneDeep(dynamicSample);
+            newS.name = cfgChild;
             deepLoad(newS, cfg[name][cfgChild]);
             child.addChild(newS);
           }
