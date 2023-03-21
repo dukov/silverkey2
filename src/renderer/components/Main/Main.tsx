@@ -15,6 +15,7 @@ type MainState = {
   addOrSave: AddKeyBtnState;
   valueToAdd: string;
   dbNames: string[];
+  selectedDB: string;
 };
 
 class Main extends React.Component<{}, MainState> {
@@ -27,6 +28,7 @@ class Main extends React.Component<{}, MainState> {
     addOrSave: AddKeyBtnState.Add,
     valueToAdd: "",
     dbNames: [],
+    selectedDB: "default",
   };
   allKeys: string[] = [];
   async readAllKeys(): Promise<string[]> {
@@ -37,7 +39,8 @@ class Main extends React.Component<{}, MainState> {
   async componentDidMount() {
     this.allKeys = await this.readAllKeys();
     const dbNames = await window.eRPC.getKVDBs();
-    this.setState({ dbNames: dbNames });
+    const selDB = await window.eRPC.getSelectedDB();
+    this.setState({ dbNames: dbNames, selectedDB: selDB });
   }
 
   private _filterKeys = (flt: string): string[] => {
@@ -112,6 +115,14 @@ class Main extends React.Component<{}, MainState> {
     this.setState({ valueToAdd: newValue });
   };
 
+  changeDB = (dbName: string) => {
+    void (async () => {
+      await window.eRPC.selectDB(dbName);
+      this.allKeys = await this.readAllKeys();
+      const filtered = this._filterKeys(this.state.searchVal);
+      this.setState({ selectedDB: dbName, filteredKeys: filtered });
+    })();
+  };
   render() {
     let res = undefined;
     if (this.state.addOrSave == AddKeyBtnState.Add) {
@@ -146,12 +157,14 @@ class Main extends React.Component<{}, MainState> {
               ? this.state.filteredKeys[this.state.selectedID]
               : ""
           }
+          selectedDB={this.state.selectedDB}
           filterKeys={this.filterKeys}
           moveUp={this.moveSelectorUp}
           moveDown={this.moveSelectorDown}
           addOrSave={this.state.addOrSave}
           saveKey={this.saveKey}
           showAddKey={this.showAddKey}
+          changeDB={this.changeDB}
         />
         <div className="delimiter"></div>
         {res}

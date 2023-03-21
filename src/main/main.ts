@@ -244,3 +244,11 @@ ipcMain.handle("run-freeplane", (_, path: string) => {
 ipcMain.handle("get-kvdbs", () => {
   return db.getDBNames();
 });
+
+ipcMain.handle("get-selected-db", () => {
+  return db.selectedDB;
+});
+
+ipcMain.handle("select-db", (_, dbName: string) => {
+  db.selectedDB = dbName;
+});
