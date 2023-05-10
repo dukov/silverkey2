@@ -1,5 +1,4 @@
 import fs from "fs";
-import { join } from "path";
 import { FREEPLANE_BASE } from "./constants";
 import jsdom from "jsdom";
 import { KVDB } from "../kvdb/types";
