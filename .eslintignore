@@ -35,3 +35,5 @@ npm-debug.log.*
 dist/*
 .eslintrc.js
 webpack.config.js
+src/main/lib/grpc/freeplane_grpc_pb.*
+src/main/lib/grpc/freeplane_pb.*

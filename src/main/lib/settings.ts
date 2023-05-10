@@ -124,8 +124,8 @@ export class Setting extends EventEmitter {
       this.dynamic = data.dynamic;
       this._children = {};
       for (const childName in data.children) {
-        let child = data.children[childName];
-        let newS = new Setting(child.name, child.value, child.description);
+        const child = data.children[childName];
+        const newS = new Setting(child.name, child.value, child.description);
         newS.fromData(child);
         this.addChild(newS);
       }

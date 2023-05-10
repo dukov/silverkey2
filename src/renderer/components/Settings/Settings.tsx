@@ -170,12 +170,14 @@ class SettingsMain extends React.Component<{}, SettingsState> {
       console.error("Key path can not be empty");
       return;
     }
-    let origSettings = structuredClone(this.state.settings);
+    const origSettings = structuredClone(this.state.settings);
     let settings = origSettings;
     for (const key of keypath) {
       if (settings == undefined || settings.value != undefined) {
         console.error(
-          `Error finding setting by path ${keypath}. Setting ${settings.name} has defined value`
+          `Error finding setting by path ${keypath.join(".")}. Setting ${
+            settings.name
+          } has defined value`
         );
         return;
       }
@@ -191,12 +193,14 @@ class SettingsMain extends React.Component<{}, SettingsState> {
     ).split(" ");
 
     keypath.shift();
-    let origSettings = structuredClone(this.state.settings);
+    const origSettings = structuredClone(this.state.settings);
     let settings = origSettings;
     for (const key of keypath) {
       if (settings == undefined || settings.value != undefined) {
         console.error(
-          `Error finding setting by path ${keypath}. Setting ${settings.name} has defined value`
+          `Error finding setting by path ${keypath.join(".")}. Setting ${
+            settings.name
+          } has defined value`
         );
         return;
       }

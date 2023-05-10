@@ -16,7 +16,7 @@ import { join } from "path";
 
 import { FreePlaneRunner } from "./lib/freeplane";
 import { KVDBClient } from "./lib/kvdb/kvdb";
-import { DB_FILE_NAME, FileDB } from "./lib/localdb/filedb";
+import { DB_FILE_NAME } from "./lib/localdb/filedb";
 import {
   CHECK_UPDATES_EVT,
   SettingData,
