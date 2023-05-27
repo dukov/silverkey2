@@ -6,6 +6,9 @@ import * as fs from "fs";
 import { join } from "path";
 
 import { ArtifactSourceClient, Artifact } from "./interface";
+import { getLogger } from "../logging/logger";
+
+const log = getLogger();
 
 export class GitHubClient extends EventEmitter implements ArtifactSourceClient {
   client: Octokit;
@@ -43,7 +46,7 @@ export class GitHubClient extends EventEmitter implements ArtifactSourceClient {
 
   async downloadArtifact(artifact_id: number, path: string): Promise<string[]> {
     const result: string[] = [];
-    console.log("Downloading artifact");
+    log.info("Downloading artifact");
     const rawArtifactLink = await this.client.rest.actions.downloadArtifact({
       owner: this.owner,
       repo: this.repo,
@@ -54,16 +57,16 @@ export class GitHubClient extends EventEmitter implements ArtifactSourceClient {
     fs.mkdirSync(path, { recursive: true });
 
     if (rawArtifactLink.data instanceof ArrayBuffer) {
-      console.log("Unzipping artifact");
+      log.info("Unzipping artifact");
       const artArch = await JSZip.loadAsync(rawArtifactLink.data);
       artArch.forEach((_, file) => {
-        console.log(`Unzipping ${file.name}`);
+        log.info(`Unzipping ${file.name}`);
         const outputPath = join(path, file.name);
         file
           .nodeStream()
           .pipe(fs.createWriteStream(outputPath))
           .on("finish", () => {
-            console.log(`File ${file.name} saved`);
+            log.info(`File ${file.name} saved`);
             result.push(outputPath);
             if (result.length == Object.keys(artArch.files).length) {
               this.emit("extracted", result);

@@ -2,6 +2,9 @@ import * as fs from "fs";
 
 import { GitHubClient } from "./github";
 import { ArtifactSourceClient } from "./interface";
+import { getLogger } from "../logging/logger";
+
+const log = getLogger();
 
 type WatcherConfig = {
   artifactName: string;
@@ -48,13 +51,13 @@ export class UpdateWatcher {
     }
   }
   run() {
-    console.log("Starting artifact watcher");
+    log.info("Starting artifact watcher");
     this.intervalID = setInterval(this.check, this.interval);
   }
 
   check = () => {
     if (this.lock) {
-      console.log("Check/Download in progress. Skipping this iteration");
+      log.debug("Check/Download in progress. Skipping this iteration");
       return;
     }
     void (async () => {
@@ -69,24 +72,24 @@ export class UpdateWatcher {
       this.artifact
     );
     if (lastArtifact == null) {
-      console.log("No artifact found. Sleeping");
+      log.debug("No artifact found. Sleeping");
       return;
     }
     if (lastArtifact.version == this.currentVersion) {
-      console.log("No new artifact. Seeping");
+      log.debug("No new artifact. Seeping");
       return;
     }
     if (lastArtifact.version == this.lastDownloadedVersion) {
-      console.log("Artifact already downloaded. Sleeping");
+      log.debug("Artifact already downloaded. Sleeping");
       return;
     }
 
-    console.log("Found new artifact. Downloading");
+    log.info("Found new artifact. Downloading");
     try {
       fs.rmSync(this.savePath, { recursive: true });
     } catch (e) {
       if (e instanceof Error && e.message.indexOf("ENOENT") != -1) {
-        console.log("Artifact download dir does not exists. Skipping removal");
+        log.warn("Artifact download dir does not exists. Skipping removal");
       } else {
         throw e;
       }
@@ -98,7 +101,7 @@ export class UpdateWatcher {
       );
       this.lastDownloadedVersion = lastArtifact.version;
     } catch (e) {
-      console.log("Failed to download. Error: ", e);
+      log.error("Failed to download. Error: ", e);
     }
   };
 }

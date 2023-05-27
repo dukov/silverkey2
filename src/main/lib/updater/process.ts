@@ -2,6 +2,10 @@ import { app, utilityProcess, UtilityProcess } from "electron";
 import { getDefaultSettings, Setting } from "../settings";
 import { installPackage } from "./installer";
 import { CONFIG_MESSAGE, INSTALL_MESSAGE, Message } from "./interface";
+import { getLogger } from "../logging/logger";
+
+const log = getLogger();
+
 export class Updater {
   private _proc: UtilityProcess | null = null;
   private path: string;
@@ -32,13 +36,13 @@ export class Updater {
         type: CONFIG_MESSAGE,
         args: [cfg, app.getPath("userData")],
       };
-      console.log("Proc", this._proc?.pid);
+      log.debug("Proc", this._proc?.pid);
       if (this._proc) this._proc.postMessage(msg);
-      console.log("Updater started");
+      log.info("Updater started");
     });
 
     this._proc.on("exit", () => {
-      console.log("Updater stopped");
+      log.info("Updater stopped");
     });
 
     this._proc.on("message", (msg) => {

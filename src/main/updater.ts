@@ -1,4 +1,5 @@
 import { join } from "path";
+
 import { SettingData } from "./lib/settings";
 import {
   CONFIG_MESSAGE,
@@ -6,6 +7,7 @@ import {
   Message,
 } from "./lib/updater/interface";
 import { UpdateWatcher } from "./lib/updater/watcher";
+import { getLogger } from "./lib/logging/logger";
 
 declare const VERSION: string;
 
@@ -29,6 +31,9 @@ class UpdaterProc {
       if (this.watcher != null) this.watcher.stop();
 
       const userData = msg.args[1] as string;
+      const log = getLogger();
+      log.transports.file.resolvePath = () => join(userData, "main.log");
+      log.info("Updater initialized");
       this.watcher = createUpdateWatcher(
         msg.args[0] as SettingData,
         join(userData, "updates")
@@ -64,4 +69,3 @@ const createUpdateWatcher = (
 };
 
 new UpdaterProc();
-console.log("Updater initialized");

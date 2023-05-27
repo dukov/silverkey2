@@ -1,8 +1,11 @@
 import fs from "fs";
 import { execFile, ChildProcess } from "child_process";
+import { getLogger } from "./logging/logger";
 
 const MAC_FREEPLANE_DEFAULT_PATH =
   "/Applications/Freeplane.app/Contents/MacOS/Freeplane";
+
+const log = getLogger();
 
 export class FreePlaneRunner {
   mmPath: string;
@@ -25,7 +28,7 @@ export class FreePlaneRunner {
     try {
       fs.statSync(MAC_FREEPLANE_DEFAULT_PATH);
     } catch (e) {
-      console.log(
+      log.error(
         `Freeplane not found in default path ${MAC_FREEPLANE_DEFAULT_PATH}`
       );
       return null;
@@ -35,11 +38,11 @@ export class FreePlaneRunner {
   private spawnFreeplaneProcess(path: string) {
     const fp = execFile(path, [this.mmPath]);
     fp.on("spawn", () => {
-      console.log("Freeplane Process started");
+      log.info("Freeplane Process started");
       this.freplane = fp;
     });
     fp.on("exit", () => {
-      console.log("Freeplane Process stopped");
+      log.info("Freeplane Process stopped");
       this.onStop();
       this.freplane = null;
     });
