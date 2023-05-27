@@ -24,14 +24,9 @@ import {
   UPDATE_SRC_CONFIG_EVT,
 } from "./lib/settings";
 import { Updater } from "./lib/updater/process";
+import { getLogger } from "./lib/logging/logger";
 
 declare const IS_PROD: boolean;
-
-const assetsDirectory = app.isPackaged
-  ? join(process.resourcesPath, "assets")
-  : join(__dirname, "../../assets");
-console.log("Assets", assetsDirectory);
-const rendererDir = join(__dirname, "../renderer");
 
 if (process.platform == "darwin") app.dock.hide();
 
@@ -52,6 +47,7 @@ const createWindow = () => {
   });
 
   // and load the index.html of the app.
+  const rendererDir = join(__dirname, "../renderer");
   void mainWindow.loadFile(join(rendererDir, "index.html"));
 
   /*
@@ -82,6 +78,10 @@ const createWindow = () => {
 };
 
 const createTray = async () => {
+  const assetsDirectory = app.isPackaged
+    ? join(process.resourcesPath, "assets")
+    : join(__dirname, "../../assets");
+  log.info("Assets", assetsDirectory);
   const icon_path = join(assetsDirectory, "sk_logo.png");
   let icon: string | NativeImage = icon_path;
   if (process.platform !== "linux") {
@@ -155,7 +155,9 @@ app.on("window-all-closed", () => {
 // code. You can also put them in separate files and require them here.
 
 const userData = app.getPath("userData");
-console.log("User data dir", userData);
+const log = getLogger();
+log.transports.file.resolvePath = () => join(userData, "main.log");
+log.info("User data dir", userData);
 const db = new KVDBClient();
 const settings = new SettingsHandler(join(userData, "skSettings.json"));
 
@@ -181,7 +183,7 @@ settings.settings.on(UPDATE_SRC_CONFIG_EVT, () => {
   updater.restart();
 });
 settings.reload();
-console.log("Settings loaded");
+log.info("Settings loaded");
 
 const freeplane: FreePlaneRunner = new FreePlaneRunner(
   join(userData, DB_FILE_NAME),
@@ -229,7 +231,7 @@ ipcMain.handle("get-settings", () => {
 ipcMain.handle("save-settings", (_, newSettings: SettingData) => {
   settings.settings.fromData(newSettings);
   settings.save();
-  console.log("Settings saved");
+  log.info("Settings saved");
 });
 
 ipcMain.handle("get-fp-path", () => {

@@ -5,9 +5,12 @@ import { app } from "electron";
 import { cloneDeep } from "lodash";
 
 import { DB_FILE_NAME } from "./localdb/filedb";
+import { getLogger } from "./logging/logger";
 
 export const UPDATE_SRC_CONFIG_EVT = "cfg.updateSourceConfig";
 export const CHECK_UPDATES_EVT = "cfg.checkUpdates";
+
+const log = getLogger();
 
 declare const IS_PROD: boolean;
 
@@ -258,7 +261,7 @@ export class SettingsHandler {
       const content = fs.readFileSync(path, { encoding: "utf-8" });
       cfg = JSON.parse(content) as typeof cfg;
     } catch (err) {
-      console.log("Did not load settings from file. Use default");
+      log.warn("Did not load settings from file. Use default");
     }
     deepLoad(defaults, cfg[defaults.name]);
     return defaults;

@@ -2,8 +2,11 @@ import fs from "fs";
 import { FREEPLANE_BASE } from "./constants";
 import jsdom from "jsdom";
 import { KVDB } from "../kvdb/types";
+import { getLogger } from "../logging/logger";
 
 export const DB_FILE_NAME = "kvdb.mm";
+
+const log = getLogger();
 
 // eslint-disable-next-line
 class FileWatcher {
@@ -13,7 +16,7 @@ class FileWatcher {
   }
 
   startWatch(onChange: (curr: fs.Stats, prev: fs.Stats) => void) {
-    console.log(`Watching for file changes on ${this.path}`);
+    log.info(`Watching for file changes on ${this.path}`);
     fs.watchFile(this.path, onChange);
   }
 }
@@ -27,7 +30,7 @@ export class FileDB implements KVDB {
     this.contents = {};
     fs.readFile(this.path, (err, data) => {
       if (err) {
-        console.log(
+        log.warn(
           `File ${this.path} does not exists initializing with empty DB`
         );
       } else {
@@ -37,12 +40,12 @@ export class FileDB implements KVDB {
 
     this.dbWatcher = new FileWatcher(this.path);
     this.dbWatcher.startWatch(() => {
-      console.log("DB updated. Re-reading");
+      log.info("DB updated. Re-reading");
       try {
         const data = fs.readFileSync(this.path);
         this.contents = new MindMap(data.toString("utf-8")).toDict();
       } catch (e) {
-        console.log("File re-read failed.");
+        log.error("File re-read failed.");
       }
     });
   }
